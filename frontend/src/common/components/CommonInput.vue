@@ -40,3 +40,7 @@ const inputValue = computed({
   },
 });
 </script>
+
+<style lang="scss">
+@import "@/assets/scss/blocks/input.scss";
+</style>

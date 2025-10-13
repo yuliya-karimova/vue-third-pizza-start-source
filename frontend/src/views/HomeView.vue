@@ -229,7 +229,5 @@ const price = computed(() => {
 @import "@/assets/scss/blocks/title.scss";
 @import "@/assets/scss/blocks/button.scss";
 @import "@/assets/scss/blocks/pizza.scss";
-@import "@/assets/scss/blocks/input.scss";
-@import "@/assets/scss/blocks/counter.scss";
 @import "@/assets/scss/blocks/filling.scss";
 </style>
