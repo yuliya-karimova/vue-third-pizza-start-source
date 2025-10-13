@@ -91,29 +91,10 @@
                       {{ ingredient.name }}
                     </span>
 
-                    <div class="counter counter--orange ingredients__counter">
-                      <button
-                        type="button"
-                        class="counter__button counter__button--minus"
-                        :disabled="ingredientsCountMap[ingredient.id] <= 0"
-                        @click="onDecreaseIngredient(ingredient.id)"
-                      >
-                        <span class="visually-hidden">Меньше</span>
-                      </button>
-                      <input
-                        type="text"
-                        name="counter"
-                        class="counter__input"
-                        :value="ingredientsCountMap[ingredient.id]"
-                      />
-                      <button
-                        type="button"
-                        class="counter__button counter__button--plus"
-                        @click="onIncreaseIngredient(ingredient.id)"
-                      >
-                        <span class="visually-hidden">Больше</span>
-                      </button>
-                    </div>
+                    <CommonCounter
+                      v-model="ingredientsCountMap[ingredient.id]"
+                      :minValue="0"
+                    />
                   </li>
                 </ul>
               </div>
@@ -122,22 +103,23 @@
         </div>
 
         <div class="content__pizza">
-          <label class="input">
-            <span class="visually-hidden">Название пиццы</span>
-            <input
-              type="text"
-              name="pizza_name"
-              placeholder="Введите название пиццы"
-              :value="pizzaName"
-            />
-          </label>
+          <CommonInput
+            v-model="pizzaName"
+            label="Название пиццы"
+            name="pizza_name"
+            placeholder="Введите название пиццы"
+          />
 
           <div class="content__constructor">
-            <div class="pizza pizza--foundation--big-tomato">
+            <div
+              :class="`pizza pizza--foundation--${sizesKeys[selectedSizeId]}-${saucesKeys[selectedSauceId]}`"
+            >
               <div class="pizza__wrapper">
-                <div class="pizza__filling pizza__filling--ananas"></div>
-                <div class="pizza__filling pizza__filling--bacon"></div>
-                <div class="pizza__filling pizza__filling--cheddar"></div>
+                <div
+                  v-for="ingredientId in selectedIngredientsIds"
+                  :key="ingredientId"
+                  :class="`pizza__filling pizza__filling--${ingredientsKeys[ingredientId]}`"
+                />
               </div>
             </div>
           </div>
@@ -154,6 +136,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import CommonCounter from "@/common/components/CommonCounter.vue";
+import CommonInput from "@/common/components/CommonInput.vue";
 // sauces
 import sauces from "@/mocks/sauces.json";
 import saucesKeys from "@/common/data/sauces.js";
@@ -207,24 +191,25 @@ const ingredientsCountMap = ref(
   }, {})
 );
 
-const onIncreaseIngredient = (id: number) => {
-  ingredientsCountMap.value[id] += 1;
-};
-
-const onDecreaseIngredient = (id: number) => {
-  ingredientsCountMap.value[id] -= 1;
-};
+const selectedIngredientsIds = computed(() => {
+  return ingredients.reduce((acc, item) => {
+    if (ingredientsCountMap.value[item.id] > 0) {
+      acc.push(item.id);
+    }
+    return acc;
+  }, []);
+});
 
 const price = computed(() => {
-  const ingredientsPrice = ingredients.reduce((acc, item) => {
-    if (ingredientsCountMap.value[item.id] >= 0) {
+  const ingredientsPrice = selectedIngredientsIds.value.reduce(
+    (acc, itemId) => {
       acc +=
-        ingredientsMap.value[item.id].price *
-        ingredientsCountMap.value[item.id];
-    }
+        ingredientsMap.value[itemId].price * ingredientsCountMap.value[itemId];
 
-    return acc;
-  }, 0);
+      return acc;
+    },
+    0
+  );
 
   const fullPrice =
     sizesMap.value[selectedSizeId.value].multiplier *
