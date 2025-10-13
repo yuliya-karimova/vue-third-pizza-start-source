@@ -17,3 +17,7 @@
 <script setup lang="ts">
 import logo from "@/assets/img/logo.svg";
 </script>
+
+<style lang="scss">
+@import "@/assets/scss/layout/header.scss";
+</style>

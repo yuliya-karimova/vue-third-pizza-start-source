@@ -235,3 +235,16 @@ const price = computed(() => {
   return Math.round(fullPrice);
 });
 </script>
+
+<style lang="scss">
+@import "@/assets/scss/blocks/dough.scss";
+@import "@/assets/scss/blocks/diameter.scss";
+@import "@/assets/scss/blocks/ingredients.scss";
+@import "@/assets/scss/blocks/radio.scss";
+@import "@/assets/scss/blocks/title.scss";
+@import "@/assets/scss/blocks/button.scss";
+@import "@/assets/scss/blocks/pizza.scss";
+@import "@/assets/scss/blocks/input.scss";
+@import "@/assets/scss/blocks/counter.scss";
+@import "@/assets/scss/blocks/filling.scss";
+</style>
