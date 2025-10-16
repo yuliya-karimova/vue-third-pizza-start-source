@@ -15,9 +15,9 @@
                 :class="`dough__input dough__input--${doughKeys[dough.id]}`"
               >
                 <input
+                  v-model="selectedDoughId"
                   type="radio"
                   name="dought"
-                  v-model="selectedDoughId"
                   :value="dough.id"
                   class="visually-hidden"
                 />
@@ -39,11 +39,11 @@
                 :class="`diameter__input diameter__input--${sizesKeys[size.id]}`"
               >
                 <input
+                  v-model="selectedSizeId"
                   type="radio"
                   name="diameter"
                   :value="size.id"
                   class="visually-hidden"
-                  v-model="selectedSizeId"
                 />
                 <span>{{ size.name }}</span>
               </label>
@@ -67,10 +67,10 @@
                   class="radio ingredients__input"
                 >
                   <input
+                    v-model="selectedSauceId"
                     type="radio"
                     name="sauce"
                     :value="sauce.id"
-                    v-model="selectedSauceId"
                   />
                   <span>{{ sauce.name }}</span>
                 </label>
@@ -91,9 +91,9 @@
                       {{ ingredient.name }}
                     </span>
 
-                    <CommonCounter
+                    <UiCounter
                       v-model="ingredientsCountMap[ingredient.id]"
-                      :minValue="0"
+                      :min-value="0"
                     />
                   </li>
                 </ul>
@@ -103,7 +103,7 @@
         </div>
 
         <div class="content__pizza">
-          <CommonInput
+          <UiInput
             v-model="pizzaName"
             label="Название пиццы"
             name="pizza_name"
@@ -136,47 +136,66 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import CommonCounter from "@/common/components/CommonCounter.vue";
-import CommonInput from "@/common/components/CommonInput.vue";
+import UiCounter from "@/common/components/counter";
+import UiInput from "@/common/components/input";
 // sauces
-import sauces from "@/mocks/sauces.json";
-import saucesKeys from "@/common/data/sauces.js";
+import saucesJson from "@/mocks/sauces.json";
+import saucesKeys from "@/common/data/sauces";
 // ingredients
-import ingredients from "@/mocks/ingredients.json";
-import ingredientsKeys from "@/common/data/ingredients.js";
+import ingredientsJson from "@/mocks/ingredients.json";
+import ingredientsKeys from "@/common/data/ingredients";
 // sizes
-import sizes from "@/mocks/sizes.json";
-import sizesKeys from "@/common/data/sizes.js";
+import sizesJson from "@/mocks/sizes.json";
+import sizesKeys from "@/common/data/sizes";
 // dough
-import doughList from "@/mocks/dough.json";
-import doughKeys from "@/common/data/dough.js";
+import doughJson from "@/mocks/dough.json";
+import doughKeys from "@/common/data/dough";
+// types
+import type { Sauce, Ingredient, Dough, Size } from "@/types";
+
+const sauces = saucesJson as Sauce[];
+const ingredients = ingredientsJson as Ingredient[];
+const sizes = sizesJson as Size[];
+const doughList = doughJson as Dough[];
 
 const saucesMap = ref(
-  sauces.reduce((acc, item) => {
-    acc[item.id] = item;
-    return acc;
-  }, {})
+  sauces.reduce(
+    (acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    },
+    {} as Record<number, Sauce>,
+  ),
 );
 
 const ingredientsMap = ref(
-  ingredients.reduce((acc, item) => {
-    acc[item.id] = item;
-    return acc;
-  }, {})
+  ingredients.reduce(
+    (acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    },
+    {} as Record<number, Ingredient>,
+  ),
 );
 
 const sizesMap = ref(
-  sizes.reduce((acc, item) => {
-    acc[item.id] = item;
-    return acc;
-  }, {})
+  sizes.reduce(
+    (acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    },
+    {} as Record<number, Size>,
+  ),
 );
 
 const doughMap = ref(
-  doughList.reduce((acc, item) => {
-    acc[item.id] = item;
-    return acc;
-  }, {})
+  doughList.reduce(
+    (acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    },
+    {} as Record<number, Dough>,
+  ),
 );
 
 const selectedDoughId = ref(doughList[0].id);
@@ -188,7 +207,7 @@ const ingredientsCountMap = ref(
   ingredients.reduce((acc: Record<number, number>, item) => {
     acc[item.id] = 0;
     return acc;
-  }, {})
+  }, {}),
 );
 
 const selectedIngredientsIds = computed(() => {
@@ -197,7 +216,7 @@ const selectedIngredientsIds = computed(() => {
       acc.push(item.id);
     }
     return acc;
-  }, []);
+  }, [] as number[]);
 });
 
 const price = computed(() => {
@@ -208,7 +227,7 @@ const price = computed(() => {
 
       return acc;
     },
-    0
+    0,
   );
 
   const fullPrice =

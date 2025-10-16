@@ -1,13 +1,10 @@
 <template>
   <div class="counter counter--orange ingredients__counter">
-    <button
-      type="button"
-      class="counter__button counter__button--minus"
+    <UiCounterButton
+      kind="minus"
       :disabled="isDecrementDisabled"
       @click="onDecrease"
-    >
-      <span class="visually-hidden">Меньше</span>
-    </button>
+    />
 
     <input
       type="text"
@@ -18,19 +15,17 @@
       aria-label="Количество ингредиента"
     />
 
-    <button
-      type="button"
-      class="counter__button counter__button--plus"
+    <UiCounterButton
+      kind="plus"
       :disabled="isIncrementDisabled"
       @click="onIncrease"
-    >
-      <span class="visually-hidden">Больше</span>
-    </button>
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
+import UiCounterButton from "./UiCounterButton.vue";
 
 interface Props {
   modelValue: number;

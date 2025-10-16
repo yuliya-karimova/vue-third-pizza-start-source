@@ -1,4 +1,4 @@
-export default {
+const ingredientsKeys: Record<number, string> = {
   1: "mushrooms",
   2: "cheddar",
   3: "salami",
@@ -15,3 +15,5 @@ export default {
   14: "parmesan",
   15: "blue_cheese",
 };
+
+export default ingredientsKeys;
