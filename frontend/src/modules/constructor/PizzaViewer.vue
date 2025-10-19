@@ -8,7 +8,11 @@
       @update:model-value="onNameInput"
     />
 
-    <div class="content__constructor">
+    <div
+      class="content__constructor"
+      @dragover.prevent="onPizzaDragOver"
+      @drop="onPizzaDrop"
+    >
       <div :class="`pizza pizza--foundation--${sizeKey}-${sauceKey}`">
         <div class="pizza__wrapper">
           <div
@@ -42,10 +46,30 @@ defineProps<Props>();
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
+  (e: "addIngredient", ingredientId: number): void;
 }>();
 
 const onNameInput = (value: string) => {
   emit("update:modelValue", value);
+};
+
+const onPizzaDragOver = (event: DragEvent) => {
+  event.preventDefault();
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = "copy";
+  }
+};
+
+const onPizzaDrop = (event: DragEvent) => {
+  event.preventDefault();
+
+  if (event.dataTransfer) {
+    const ingredientId = Number(event.dataTransfer.getData("ingredientId"));
+
+    if (!isNaN(ingredientId) && ingredientId > 0) {
+      emit("addIngredient", ingredientId);
+    }
+  }
 };
 </script>
 

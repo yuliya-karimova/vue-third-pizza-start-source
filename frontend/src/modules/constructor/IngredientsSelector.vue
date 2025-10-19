@@ -17,6 +17,8 @@
             >
               <span
                 :class="`filling filling--${ingredientsKeys[ingredient.id]}`"
+                draggable="true"
+                @dragstart="onIngredientDragStart($event, ingredient)"
               >
                 {{ ingredient.name }}
               </span>
@@ -72,6 +74,13 @@ const updateIngredientCount = (ingredient: Ingredient, newCount: number) => {
   }
 
   emit("update:modelValue", newMap);
+};
+
+const onIngredientDragStart = (event: DragEvent, ingredient: Ingredient) => {
+  if (event.dataTransfer) {
+    event.dataTransfer.setData("ingredientId", String(ingredient.id));
+    event.dataTransfer.effectAllowed = "copy";
+  }
 };
 </script>
 

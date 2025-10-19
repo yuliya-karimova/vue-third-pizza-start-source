@@ -28,6 +28,7 @@
           :sauce-key="currentSauceKey"
           :ingredients-for-pizza="ingredientsForPizza"
           :price="price"
+          @add-ingredient="onAddIngredient"
         />
       </div>
     </form>
@@ -101,6 +102,38 @@ const price = computed(() => {
 
   return Math.round(fullPrice);
 });
+
+const ingredientsMap = computed(() =>
+  ingredientList.reduce(
+    (acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    },
+    {} as Record<number, Ingredient>,
+  ),
+);
+
+const onAddIngredient = (ingredientId: number) => {
+  const currentIngredient = ingredientsMap.value[ingredientId];
+
+  if (!currentIngredient) {
+    console.error("Ингредиент не найден:", ingredientId);
+    return;
+  }
+
+  const newSelectedIngredients = { ...selectedIngredients.value };
+
+  if (newSelectedIngredients[ingredientId]) {
+    newSelectedIngredients[ingredientId].count++;
+  } else {
+    newSelectedIngredients[ingredientId] = {
+      count: 1,
+      price: currentIngredient.price,
+    };
+  }
+
+  selectedIngredients.value = newSelectedIngredients;
+};
 </script>
 
 <style lang="scss">
