@@ -2,11 +2,11 @@
   <label class="input">
     <span class="visually-hidden">{{ label }}</span>
     <input
-      :type="type"
+      v-model="inputValue"
+      type="text"
       :name="name"
       :placeholder="placeholder"
       class="input__field"
-      v-model="inputValue"
     />
   </label>
 </template>
@@ -15,20 +15,18 @@
 import { computed } from "vue";
 
 interface Props {
-  modelValue: string | number;
+  modelValue: string;
   name: string;
   placeholder?: string;
   label: string;
-  type?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: "",
-  type: "text",
 });
 
 const emit = defineEmits<{
-  (e: "update:modelValue", value: string | number): void;
+  (e: "update:modelValue", value: string): void;
 }>();
 
 const inputValue = computed({

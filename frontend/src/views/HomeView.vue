@@ -14,51 +14,21 @@
           :sizes-keys="sizesKeys"
         />
 
-        <div class="content__ingredients">
-          <div class="sheet">
-            <h2 class="title title--small sheet__title">
-              Выберите ингредиенты
-            </h2>
+        <IngredientsSelector
+          v-model="selectedIngredients"
+          :ingredient-list="ingredientList"
+          :ingredients-keys="ingredientsKeys"
+        >
+          <SaucesSelector v-model="selectedSauce" :sauce-list="sauceList" />
+        </IngredientsSelector>
 
-            <div class="sheet__content ingredients">
-              <SaucesSelector v-model="selectedSauce" :sauce-list="sauceList" />
-
-              <IngredientsSelector
-                v-model="selectedIngredients"
-                :ingredient-list="ingredientList"
-                :ingredients-keys="ingredientsKeys"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="content__pizza">
-          <UiInput
-            v-model="pizzaName"
-            label="Название пиццы"
-            name="pizza_name"
-            placeholder="Введите название пиццы"
-          />
-
-          <div class="content__constructor">
-            <div
-              :class="`pizza pizza--foundation--${sizesKeys[selectedSize.id]}-${saucesKeys[selectedSauce.id]}`"
-            >
-              <div class="pizza__wrapper">
-                <div
-                  v-for="ingredientId in selectedIngredientsIds"
-                  :key="ingredientId"
-                  :class="`pizza__filling pizza__filling--${ingredientsKeys[ingredientId]}`"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="content__result">
-            <p>Итого: {{ price }} ₽</p>
-            <button type="button" class="button" disabled>Готовьте!</button>
-          </div>
-        </div>
+        <PizzaViewer
+          v-model="pizzaName"
+          :size-key="currentSizeKey"
+          :sauce-key="currentSauceKey"
+          :ingredients-for-pizza="ingredientsForPizza"
+          :price="price"
+        />
       </div>
     </form>
   </main>
@@ -87,11 +57,11 @@ import type {
   IngredientsCounter,
 } from "@/types";
 // components
-import UiInput from "@/common/components/input";
 import DoughSelector from "@/modules/constructor/DoughSelector.vue";
 import SizeSelector from "@/modules/constructor/SizeSelector.vue";
 import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
 import SaucesSelector from "@/modules/constructor/SaucesSelector.vue";
+import PizzaViewer from "@/modules/constructor/PizzaViewer.vue";
 
 const sauceList = saucesJson as Sauce[];
 const ingredientList = ingredientsJson as Ingredient[];
@@ -104,9 +74,20 @@ const selectedSize = ref(sizeList[0]);
 const selectedIngredients: Ref<IngredientsCounter> = ref({});
 const pizzaName = ref("");
 
-const selectedIngredientsIds = computed(() =>
-  Object.keys(selectedIngredients.value).map((item) => Number(item)),
-);
+const ingredientsForPizza = computed(() => {
+  const keys: string[] = [];
+  for (const id in selectedIngredients.value) {
+    const item = selectedIngredients.value[id]; // { count, price }
+    const key = ingredientsKeys[id]; // 'bacon'
+    for (let i = 0; i < item.count; i++) {
+      keys.push(key);
+    }
+  }
+  return keys;
+});
+
+const currentSizeKey = computed(() => sizesKeys[selectedSize.value.id]);
+const currentSauceKey = computed(() => saucesKeys[selectedSauce.value.id]);
 
 const price = computed(() => {
   const ingredientsPrice = Object.values(selectedIngredients.value).reduce(
@@ -124,6 +105,4 @@ const price = computed(() => {
 
 <style lang="scss">
 @import "@/assets/scss/blocks/title.scss";
-@import "@/assets/scss/blocks/button.scss";
-@import "@/assets/scss/blocks/pizza.scss";
 </style>
