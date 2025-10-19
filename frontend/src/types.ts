@@ -32,3 +32,8 @@ export interface Misc {
   image: string;
   price: number;
 }
+
+export type IngredientsCounter = Record<
+  number,
+  { count: number; price: number }
+>;

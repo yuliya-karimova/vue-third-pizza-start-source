@@ -3,53 +3,16 @@
     <form action="#" method="post">
       <div class="content__wrapper">
         <h1 class="title title--big">Конструктор пиццы</h1>
-
-        <div class="content__dough">
-          <div class="sheet">
-            <h2 class="title title--small sheet__title">Выберите тесто</h2>
-
-            <div class="sheet__content dough">
-              <label
-                v-for="dough in doughList"
-                :key="dough.id"
-                :class="`dough__input dough__input--${doughKeys[dough.id]}`"
-              >
-                <input
-                  v-model="selectedDoughId"
-                  type="radio"
-                  name="dought"
-                  :value="dough.id"
-                  class="visually-hidden"
-                />
-                <b>{{ dough.name }}</b>
-                <span>{{ dough.description }}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="content__diameter">
-          <div class="sheet">
-            <h2 class="title title--small sheet__title">Выберите размер</h2>
-
-            <div class="sheet__content diameter">
-              <label
-                v-for="size in sizes"
-                :key="size.id"
-                :class="`diameter__input diameter__input--${sizesKeys[size.id]}`"
-              >
-                <input
-                  v-model="selectedSizeId"
-                  type="radio"
-                  name="diameter"
-                  :value="size.id"
-                  class="visually-hidden"
-                />
-                <span>{{ size.name }}</span>
-              </label>
-            </div>
-          </div>
-        </div>
+        <DoughSelector
+          :model-value="selectedDough"
+          :dough-list="doughList"
+          :dough-keys="doughKeys"
+        />
+        <SizeSelector
+          v-model="selectedSize"
+          :size-list="sizeList"
+          :sizes-keys="sizesKeys"
+        />
 
         <div class="content__ingredients">
           <div class="sheet">
@@ -58,46 +21,13 @@
             </h2>
 
             <div class="sheet__content ingredients">
-              <div class="ingredients__sauce">
-                <p>Основной соус:</p>
+              <SaucesSelector v-model="selectedSauce" :sauce-list="sauceList" />
 
-                <label
-                  v-for="sauce in sauces"
-                  :key="sauce.id"
-                  class="radio ingredients__input"
-                >
-                  <input
-                    v-model="selectedSauceId"
-                    type="radio"
-                    name="sauce"
-                    :value="sauce.id"
-                  />
-                  <span>{{ sauce.name }}</span>
-                </label>
-              </div>
-
-              <div class="ingredients__filling">
-                <p>Начинка:</p>
-
-                <ul class="ingredients__list">
-                  <li
-                    v-for="ingredient in ingredients"
-                    :key="ingredient.id"
-                    class="ingredients__item"
-                  >
-                    <span
-                      :class="`filling filling--${ingredientsKeys[ingredient.id]}`"
-                    >
-                      {{ ingredient.name }}
-                    </span>
-
-                    <UiCounter
-                      v-model="ingredientsCountMap[ingredient.id]"
-                      :min-value="0"
-                    />
-                  </li>
-                </ul>
-              </div>
+              <IngredientsSelector
+                v-model="selectedIngredients"
+                :ingredient-list="ingredientList"
+                :ingredients-keys="ingredientsKeys"
+              />
             </div>
           </div>
         </div>
@@ -112,7 +42,7 @@
 
           <div class="content__constructor">
             <div
-              :class="`pizza pizza--foundation--${sizesKeys[selectedSizeId]}-${saucesKeys[selectedSauceId]}`"
+              :class="`pizza pizza--foundation--${sizesKeys[selectedSize.id]}-${saucesKeys[selectedSauce.id]}`"
             >
               <div class="pizza__wrapper">
                 <div
@@ -135,9 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import UiCounter from "@/common/components/counter";
-import UiInput from "@/common/components/input";
+import { ref, computed, Ref } from "vue";
 // sauces
 import saucesJson from "@/mocks/sauces.json";
 import saucesKeys from "@/common/data/sauces";
@@ -148,105 +76,54 @@ import ingredientsKeys from "@/common/data/ingredients";
 import sizesJson from "@/mocks/sizes.json";
 import sizesKeys from "@/common/data/sizes";
 // dough
-import doughJson from "@/mocks/dough.json";
 import doughKeys from "@/common/data/dough";
+import doughJson from "@/mocks/dough.json";
 // types
-import type { Sauce, Ingredient, Dough, Size } from "@/types";
+import type {
+  Sauce,
+  Ingredient,
+  Dough,
+  Size,
+  IngredientsCounter,
+} from "@/types";
+// components
+import UiInput from "@/common/components/input";
+import DoughSelector from "@/modules/constructor/DoughSelector.vue";
+import SizeSelector from "@/modules/constructor/SizeSelector.vue";
+import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
+import SaucesSelector from "@/modules/constructor/SaucesSelector.vue";
 
-const sauces = saucesJson as Sauce[];
-const ingredients = ingredientsJson as Ingredient[];
-const sizes = sizesJson as Size[];
+const sauceList = saucesJson as Sauce[];
+const ingredientList = ingredientsJson as Ingredient[];
+const sizeList = sizesJson as Size[];
 const doughList = doughJson as Dough[];
 
-const saucesMap = ref(
-  sauces.reduce(
-    (acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    },
-    {} as Record<number, Sauce>,
-  ),
-);
-
-const ingredientsMap = ref(
-  ingredients.reduce(
-    (acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    },
-    {} as Record<number, Ingredient>,
-  ),
-);
-
-const sizesMap = ref(
-  sizes.reduce(
-    (acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    },
-    {} as Record<number, Size>,
-  ),
-);
-
-const doughMap = ref(
-  doughList.reduce(
-    (acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    },
-    {} as Record<number, Dough>,
-  ),
-);
-
-const selectedDoughId = ref(doughList[0].id);
-const selectedSauceId = ref(sauces[0].id);
-const selectedSizeId = ref(sizes[0].id);
+const selectedDough = ref(doughList[0]);
+const selectedSauce = ref(sauceList[0]);
+const selectedSize = ref(sizeList[0]);
+const selectedIngredients: Ref<IngredientsCounter> = ref({});
 const pizzaName = ref("");
 
-const ingredientsCountMap = ref(
-  ingredients.reduce((acc: Record<number, number>, item) => {
-    acc[item.id] = 0;
-    return acc;
-  }, {}),
+const selectedIngredientsIds = computed(() =>
+  Object.keys(selectedIngredients.value).map((item) => Number(item)),
 );
 
-const selectedIngredientsIds = computed(() => {
-  return ingredients.reduce((acc, item) => {
-    if (ingredientsCountMap.value[item.id] > 0) {
-      acc.push(item.id);
-    }
-    return acc;
-  }, [] as number[]);
-});
-
 const price = computed(() => {
-  const ingredientsPrice = selectedIngredientsIds.value.reduce(
-    (acc, itemId) => {
-      acc +=
-        ingredientsMap.value[itemId].price * ingredientsCountMap.value[itemId];
-
-      return acc;
-    },
+  const ingredientsPrice = Object.values(selectedIngredients.value).reduce(
+    (acc, { count, price }) => (acc += count * price),
     0,
   );
 
   const fullPrice =
-    sizesMap.value[selectedSizeId.value].multiplier *
-    (saucesMap.value[selectedDoughId.value].price +
-      doughMap.value[selectedDoughId.value].price +
-      ingredientsPrice);
+    selectedSize.value.multiplier *
+    (selectedSauce.value.price + selectedDough.value.price + ingredientsPrice);
 
   return Math.round(fullPrice);
 });
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/dough.scss";
-@import "@/assets/scss/blocks/diameter.scss";
-@import "@/assets/scss/blocks/ingredients.scss";
-@import "@/assets/scss/blocks/radio.scss";
 @import "@/assets/scss/blocks/title.scss";
 @import "@/assets/scss/blocks/button.scss";
 @import "@/assets/scss/blocks/pizza.scss";
-@import "@/assets/scss/blocks/filling.scss";
 </style>
