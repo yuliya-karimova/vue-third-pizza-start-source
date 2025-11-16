@@ -127,6 +127,26 @@ export const usePizzaStore = defineStore("pizza", {
       }
     },
 
+    increaseIngredientCount(ingredientId: number, price: number) {
+      if (this.selectedIngredients[ingredientId]) {
+        this.selectedIngredients[ingredientId].count++;
+      } else {
+        this.selectedIngredients[ingredientId] = {
+          count: 1,
+          price,
+        };
+      }
+    },
+
+    decreaseIngredientCount(ingredientId: number) {
+      if (this.selectedIngredients[ingredientId]) {
+        this.selectedIngredients[ingredientId].count--;
+        if (this.selectedIngredients[ingredientId].count <= 0) {
+          delete this.selectedIngredients[ingredientId];
+        }
+      }
+    },
+
     resetPizza() {
       this.selectedDough = null;
       this.selectedSize = null;

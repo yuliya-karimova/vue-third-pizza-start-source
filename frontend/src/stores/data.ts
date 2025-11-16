@@ -45,5 +45,41 @@ export const useDataStore = defineStore("data", {
       );
     },
   },
+
+  actions: {
+    setDough(dough: Dough[]) {
+      this.dough = dough;
+    },
+
+    setSizes(sizes: Size[]) {
+      this.sizes = sizes;
+    },
+
+    setSauces(sauces: Sauce[]) {
+      this.sauces = sauces;
+    },
+
+    setIngredients(ingredients: Ingredient[]) {
+      this.ingredients = ingredients;
+    },
+
+    setMisc(misc: Misc[]) {
+      this.misc = misc;
+    },
+
+    setAllData(data: {
+      dough: Dough[];
+      sizes: Size[];
+      sauces: Sauce[];
+      ingredients: Ingredient[];
+      misc: Misc[];
+    }) {
+      this.dough = data.dough;
+      this.sizes = data.sizes;
+      this.sauces = data.sauces;
+      this.ingredients = data.ingredients;
+      this.misc = data.misc;
+    },
+  },
 });
 

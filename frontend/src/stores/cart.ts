@@ -110,6 +110,24 @@ export const useCartStore = defineStore("cart", {
       }
     },
 
+    increasePizzaQuantity(pizzaId: string) {
+      const pizza = this.pizzas.find((p) => p.id === pizzaId);
+      if (pizza) {
+        pizza.quantity++;
+      }
+    },
+
+    decreasePizzaQuantity(pizzaId: string) {
+      const pizza = this.pizzas.find((p) => p.id === pizzaId);
+      if (pizza) {
+        if (pizza.quantity > 1) {
+          pizza.quantity--;
+        } else {
+          this.removePizza(pizzaId);
+        }
+      }
+    },
+
     addMisc(misc: Misc, quantity: number = 1) {
       const existingItem = this.misc.find((item) => item.misc.id === misc.id);
       if (existingItem) {
@@ -133,6 +151,24 @@ export const useCartStore = defineStore("cart", {
           this.removeMisc(miscId);
         } else {
           item.quantity = quantity;
+        }
+      }
+    },
+
+    increaseMiscQuantity(miscId: number) {
+      const item = this.misc.find((item) => item.misc.id === miscId);
+      if (item) {
+        item.quantity++;
+      }
+    },
+
+    decreaseMiscQuantity(miscId: number) {
+      const item = this.misc.find((item) => item.misc.id === miscId);
+      if (item) {
+        if (item.quantity > 1) {
+          item.quantity--;
+        } else {
+          this.removeMisc(miscId);
         }
       }
     },
