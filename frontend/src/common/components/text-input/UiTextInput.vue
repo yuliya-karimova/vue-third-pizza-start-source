@@ -3,7 +3,7 @@
     <span class="visually-hidden">{{ label }}</span>
     <input
       v-model="inputValue"
-      type="text"
+      :type="type"
       :name="name"
       :placeholder="placeholder"
       class="input__field"
@@ -19,10 +19,12 @@ interface Props {
   name: string;
   placeholder?: string;
   label: string;
+  type?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: "",
+  type: "text",
 });
 
 const emit = defineEmits<{
