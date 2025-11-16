@@ -23,7 +23,7 @@
                 {{ ingredient.name }}
               </span>
 
-              <UiCounter
+              <AppCounter
                 :model-value="countMap[ingredient.id] || 0"
                 :min-value="0"
                 @update:model-value="updateIngredientCount(ingredient, $event)"
@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import UiCounter from "@/common/components/counter";
+import AppCounter from "@/common/components/counter";
 import type { Ingredient, IngredientsCounter } from "@/types";
 
 interface Props {

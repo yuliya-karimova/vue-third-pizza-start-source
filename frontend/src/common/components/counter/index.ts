@@ -1,1 +1,1 @@
-export { default } from "./UiCounter.vue";
+export { default } from "./AppCounter.vue";
