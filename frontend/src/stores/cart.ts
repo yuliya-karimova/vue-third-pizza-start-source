@@ -1,0 +1,124 @@
+import { defineStore } from "pinia";
+import type { Dough, Size, Sauce, IngredientsCounter, Misc } from "@/types";
+
+export interface CartPizza {
+  id: string; // уникальный ID для пиццы в корзине
+  name: string;
+  dough: Dough;
+  size: Size;
+  sauce: Sauce;
+  ingredients: IngredientsCounter;
+  quantity: number;
+  price: number;
+}
+
+export interface CartMisc {
+  misc: Misc;
+  quantity: number;
+}
+
+export interface CartState {
+  pizzas: CartPizza[];
+  misc: CartMisc[];
+}
+
+export const useCartStore = defineStore("cart", {
+  state: (): CartState => ({
+    pizzas: [],
+    misc: [],
+  }),
+
+  getters: {
+    totalPizzasPrice: (state) => {
+      return state.pizzas.reduce(
+        (total, pizza) => total + pizza.price * pizza.quantity,
+        0,
+      );
+    },
+
+    totalMiscPrice: (state) => {
+      return state.misc.reduce(
+        (total, item) => total + item.misc.price * item.quantity,
+        0,
+      );
+    },
+
+    totalPrice(): number {
+      return this.totalPizzasPrice + this.totalMiscPrice;
+    },
+
+    totalItems: (state) => {
+      const pizzasCount = state.pizzas.reduce(
+        (total, pizza) => total + pizza.quantity,
+        0,
+      );
+      const miscCount = state.misc.reduce(
+        (total, item) => total + item.quantity,
+        0,
+      );
+      return pizzasCount + miscCount;
+    },
+
+    isEmpty: (state) => {
+      return state.pizzas.length === 0 && state.misc.length === 0;
+    },
+  },
+
+  actions: {
+    addPizza(pizza: Omit<CartPizza, "id" | "quantity">) {
+      const id = `pizza-${Date.now()}-${Math.random()}`;
+      this.pizzas.push({
+        ...pizza,
+        id,
+        quantity: 1,
+      });
+    },
+
+    removePizza(pizzaId: string) {
+      const index = this.pizzas.findIndex((p) => p.id === pizzaId);
+      if (index !== -1) {
+        this.pizzas.splice(index, 1);
+      }
+    },
+
+    updatePizzaQuantity(pizzaId: string, quantity: number) {
+      const pizza = this.pizzas.find((p) => p.id === pizzaId);
+      if (pizza) {
+        pizza.quantity = Math.max(1, quantity);
+      }
+    },
+
+    addMisc(misc: Misc, quantity: number = 1) {
+      const existingItem = this.misc.find((item) => item.misc.id === misc.id);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        this.misc.push({ misc, quantity });
+      }
+    },
+
+    removeMisc(miscId: number) {
+      const index = this.misc.findIndex((item) => item.misc.id === miscId);
+      if (index !== -1) {
+        this.misc.splice(index, 1);
+      }
+    },
+
+    updateMiscQuantity(miscId: number, quantity: number) {
+      const item = this.misc.find((item) => item.misc.id === miscId);
+      if (item) {
+        if (quantity <= 0) {
+          this.removeMisc(miscId);
+        } else {
+          item.quantity = quantity;
+        }
+      }
+    },
+
+    clearCart() {
+      this.pizzas = [];
+      this.misc = [];
+    },
+  },
+});
+

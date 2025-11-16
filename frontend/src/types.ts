@@ -37,3 +37,10 @@ export type IngredientsCounter = Record<
   number,
   { count: number; price: number }
 >;
+
+export interface Misc {
+  id: number;
+  name: string;
+  image: string;
+  price: number;
+}
