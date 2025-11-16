@@ -1,16 +1,19 @@
 import { defineStore } from "pinia";
 
 export interface Address {
-  id: string;
+  id?: number;
   name: string;
   street: string;
-  house: string;
-  apartment?: string;
+  building: string;
+  flat?: string;
   comment?: string;
+  userId?: string;
 }
 
 export interface ProfileState {
+  id?: string;
   name: string;
+  email: string;
   phone: string;
   avatar?: string;
   addresses: Address[];
@@ -18,7 +21,9 @@ export interface ProfileState {
 
 export const useProfileStore = defineStore("profile", {
   state: (): ProfileState => ({
+    id: undefined,
     name: "",
+    email: "",
     phone: "",
     avatar: undefined,
     addresses: [],
@@ -26,14 +31,16 @@ export const useProfileStore = defineStore("profile", {
 
   getters: {
     hasAddresses: (state) => state.addresses.length > 0,
-    getAddressById: (state) => (id: string) => {
+    getAddressById: (state) => (id: number) => {
       return state.addresses.find((a) => a.id === id);
     },
   },
 
   actions: {
-    setProfile(name: string, phone: string, avatar?: string) {
+    setProfile(id: string, name: string, email: string, phone: string, avatar?: string) {
+      this.id = id;
       this.name = name;
+      this.email = email;
       this.phone = phone;
       if (avatar) {
         this.avatar = avatar;
@@ -41,14 +48,12 @@ export const useProfileStore = defineStore("profile", {
     },
 
     addAddress(address: Omit<Address, "id">) {
-      const id = `address-${Date.now()}-${Math.random()}`;
       this.addresses.push({
         ...address,
-        id,
       });
     },
 
-    updateAddress(addressId: string, address: Partial<Omit<Address, "id">>) {
+    updateAddress(addressId: number, address: Partial<Omit<Address, "id">>) {
       const index = this.addresses.findIndex((a) => a.id === addressId);
       if (index !== -1) {
         this.addresses[index] = {
@@ -58,7 +63,7 @@ export const useProfileStore = defineStore("profile", {
       }
     },
 
-    removeAddress(addressId: string) {
+    removeAddress(addressId: number) {
       const index = this.addresses.findIndex((a) => a.id === addressId);
       if (index !== -1) {
         this.addresses.splice(index, 1);
@@ -66,7 +71,9 @@ export const useProfileStore = defineStore("profile", {
     },
 
     clearProfile() {
+      this.id = undefined;
       this.name = "";
+      this.email = "";
       this.phone = "";
       this.avatar = undefined;
       this.addresses = [];
