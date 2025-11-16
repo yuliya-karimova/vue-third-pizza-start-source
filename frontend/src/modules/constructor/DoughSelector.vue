@@ -61,5 +61,5 @@ const selectedDoughId = computed({
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/dough.scss";
+@use "@/assets/scss/blocks/dough";
 </style>

@@ -66,5 +66,5 @@ const onIncrease = () => {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/counter.scss";
+@use "@/assets/scss/blocks/counter";
 </style>

@@ -7,7 +7,8 @@ import AppLayout from "@/layouts/AppLayout.vue";
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/app.scss";
+@use "@/assets/scss/app";
+@use "@/assets/scss/ds-system/ds" as *;
 
 body {
   justify-content: center;

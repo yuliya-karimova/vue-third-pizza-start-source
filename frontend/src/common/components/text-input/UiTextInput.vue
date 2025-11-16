@@ -40,5 +40,5 @@ const inputValue = computed({
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/input.scss";
+@use "@/assets/scss/blocks/input";
 </style>

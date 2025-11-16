@@ -85,6 +85,6 @@ const onIngredientDragStart = (event: DragEvent, ingredient: Ingredient) => {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/ingredients.scss";
-@import "@/assets/scss/blocks/filling.scss";
+@use "@/assets/scss/blocks/ingredients";
+@use "@/assets/scss/blocks/filling";
 </style>

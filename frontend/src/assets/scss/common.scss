@@ -4,16 +4,16 @@
 @use "ds-system/ds-typography";
 
 // Основные блоки (используются в большинстве шаблонов)
-@import "blocks/title.scss";
-@import "blocks/button.scss";
-@import "blocks/input.scss";
-@import "blocks/select.scss";
-@import "blocks/product.scss";
-@import "blocks/counter.scss";
+@use "blocks/title";
+@use "blocks/button";
+@use "blocks/input";
+@use "blocks/select";
+@use "blocks/product";
+@use "blocks/counter";
 
 // Блоки, используемые в конкретных шаблонах
-@import "blocks/cart-list.scss";
-@import "blocks/address-form.scss";
+@use "blocks/cart-list";
+@use "blocks/address-form";
 
 
 // Правила, которые повторяются в разных компонентах

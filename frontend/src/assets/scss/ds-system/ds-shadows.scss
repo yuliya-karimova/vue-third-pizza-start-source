@@ -1,4 +1,4 @@
-@import "./ds-colors";
+@use "./ds-colors" as *;
 
 $shadow-light: 0 4px 8px rgba($black, 0.04), 0 0 2px rgba($black, 0.06), 0 0 1px rgba($black, 0.04);
 $shadow-regular: 0 0 0 2px rgba($green-500, 0.6);

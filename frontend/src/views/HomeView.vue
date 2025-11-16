@@ -137,5 +137,5 @@ const onAddIngredient = (ingredientId: number) => {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/title.scss";
+@use "@/assets/scss/blocks/title";
 </style>

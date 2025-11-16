@@ -1,4 +1,4 @@
-@use "ds-system/ds.scss";
+@use "ds-system/ds" as *;
 
 body {
   display: flex;
@@ -7,8 +7,8 @@ body {
   min-width: 960px;
   min-height: 100vh;
 
-  color: ds.$black;
-  background-color: ds.$white;
+  color: $black;
+  background-color: $white;
 
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;

@@ -19,5 +19,5 @@ import logo from "@/assets/img/logo.svg";
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/layout/header.scss";
+@use "@/assets/scss/layout/header";
 </style>
