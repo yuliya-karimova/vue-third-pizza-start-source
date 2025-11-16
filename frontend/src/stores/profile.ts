@@ -34,6 +34,15 @@ export const useProfileStore = defineStore("profile", {
     getAddressById: (state) => (id: number) => {
       return state.addresses.find((a) => a.id === id);
     },
+    hasProfile: (state) => !!state.id,
+    isProfileFilled: (state) => {
+      return !!(
+        state.id &&
+        state.name.trim().length > 0 &&
+        state.email.trim().length > 0 &&
+        state.phone.trim().length > 0
+      );
+    },
   },
 
   actions: {

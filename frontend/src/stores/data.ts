@@ -26,6 +26,24 @@ export const useDataStore = defineStore("data", {
     getMiscById: (state) => (id: number) => {
       return state.misc.find((m) => m.id === id);
     },
+    isDataLoaded: (state) => {
+      return (
+        state.dough.length > 0 &&
+        state.sizes.length > 0 &&
+        state.sauces.length > 0 &&
+        state.ingredients.length > 0 &&
+        state.misc.length > 0
+      );
+    },
+    hasData: (state) => {
+      return (
+        state.dough.length > 0 ||
+        state.sizes.length > 0 ||
+        state.sauces.length > 0 ||
+        state.ingredients.length > 0 ||
+        state.misc.length > 0
+      );
+    },
   },
 });
 

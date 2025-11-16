@@ -59,8 +59,30 @@ export const useCartStore = defineStore("cart", {
       return pizzasCount + miscCount;
     },
 
+    totalPizzasCount: (state) => {
+      return state.pizzas.reduce(
+        (total, pizza) => total + pizza.quantity,
+        0,
+      );
+    },
+
+    totalMiscCount: (state) => {
+      return state.misc.reduce(
+        (total, item) => total + item.quantity,
+        0,
+      );
+    },
+
     isEmpty: (state) => {
       return state.pizzas.length === 0 && state.misc.length === 0;
+    },
+
+    hasPizzas: (state) => state.pizzas.length > 0,
+
+    hasMisc: (state) => state.misc.length > 0,
+
+    getPizzaById: (state) => (id: string) => {
+      return state.pizzas.find((p) => p.id === id);
     },
   },
 

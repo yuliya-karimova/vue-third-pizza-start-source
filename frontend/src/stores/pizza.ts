@@ -47,6 +47,26 @@ export const usePizzaStore = defineStore("pizza", {
         state.selectedSauce
       );
     },
+
+    hasIngredients: (state) => {
+      return Object.keys(state.selectedIngredients).length > 0;
+    },
+
+    totalIngredientsCount: (state) => {
+      return Object.values(state.selectedIngredients).reduce(
+        (total, { count }) => total + count,
+        0,
+      );
+    },
+
+    isPizzaReady: (state) => {
+      return !!(
+        state.selectedDough &&
+        state.selectedSize &&
+        state.selectedSauce &&
+        state.pizzaName.trim().length > 0
+      );
+    },
   },
 
   actions: {
