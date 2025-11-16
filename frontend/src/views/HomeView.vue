@@ -4,31 +4,41 @@
       <div class="content__wrapper">
         <h1 class="title title--big">Конструктор пиццы</h1>
         <DoughSelector
-          :model-value="selectedDough"
-          :dough-list="doughList"
+          :model-value="pizzaStore.selectedDough"
+          :dough-list="dataStore.dough"
           :dough-keys="doughKeys"
+          @update:model-value="(dough) => pizzaStore.setDough(dough)"
         />
         <SizeSelector
-          v-model="selectedSize"
-          :size-list="sizeList"
+          :model-value="pizzaStore.selectedSize"
+          :size-list="dataStore.sizes"
           :sizes-keys="sizesKeys"
+          @update:model-value="(size) => pizzaStore.setSize(size)"
         />
 
         <IngredientsSelector
-          v-model="selectedIngredients"
-          :ingredient-list="ingredientList"
+          :model-value="pizzaStore.selectedIngredients"
+          :ingredient-list="dataStore.ingredients"
           :ingredients-keys="ingredientsKeys"
+          @update:model-value="updateIngredients"
         >
-          <SaucesSelector v-model="selectedSauce" :sauce-list="sauceList" />
+          <SaucesSelector
+            :model-value="pizzaStore.selectedSauce"
+            :sauce-list="dataStore.sauces"
+            @update:model-value="(sauce) => pizzaStore.setSauce(sauce)"
+          />
         </IngredientsSelector>
 
         <PizzaViewer
-          v-model="pizzaName"
+          :model-value="pizzaStore.pizzaName"
           :size-key="currentSizeKey"
           :sauce-key="currentSauceKey"
           :ingredients-for-pizza="ingredientsForPizza"
-          :price="price"
+          :price="pizzaStore.pizzaPrice"
+          :is-ready="pizzaStore.isPizzaReady"
+          @update:model-value="pizzaStore.setPizzaName"
           @add-ingredient="onAddIngredient"
+          @add-to-cart="onAddToCart"
         />
       </div>
     </form>
@@ -36,50 +46,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, Ref } from "vue";
-// sauces
-import saucesJson from "@/mocks/sauces.json";
+import { computed, onMounted } from "vue";
 import saucesKeys from "@/common/data/sauces";
-// ingredients
-import ingredientsJson from "@/mocks/ingredients.json";
 import ingredientsKeys from "@/common/data/ingredients";
-// sizes
-import sizesJson from "@/mocks/sizes.json";
 import sizesKeys from "@/common/data/sizes";
-// dough
 import doughKeys from "@/common/data/dough";
-import doughJson from "@/mocks/dough.json";
-// types
-import type {
-  Sauce,
-  Ingredient,
-  Dough,
-  Size,
-  IngredientsCounter,
-} from "@/types";
-// components
+import { usePizzaStore } from "@/stores/pizza";
+import { useDataStore } from "@/stores/data";
+import { useCartStore } from "@/stores/cart";
 import DoughSelector from "@/modules/constructor/DoughSelector.vue";
 import SizeSelector from "@/modules/constructor/SizeSelector.vue";
 import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
 import SaucesSelector from "@/modules/constructor/SaucesSelector.vue";
 import PizzaViewer from "@/modules/constructor/PizzaViewer.vue";
 
-const sauceList = saucesJson as Sauce[];
-const ingredientList = ingredientsJson as Ingredient[];
-const sizeList = sizesJson as Size[];
-const doughList = doughJson as Dough[];
+const pizzaStore = usePizzaStore();
+const dataStore = useDataStore();
+const cartStore = useCartStore();
 
-const selectedDough = ref(doughList[0]);
-const selectedSauce = ref(sauceList[0]);
-const selectedSize = ref(sizeList[0]);
-const selectedIngredients: Ref<IngredientsCounter> = ref({});
-const pizzaName = ref("");
+onMounted(() => {
+  pizzaStore.initDefaultValues();
+});
 
 const ingredientsForPizza = computed(() => {
   const keys: string[] = [];
-  for (const id in selectedIngredients.value) {
-    const item = selectedIngredients.value[id]; // { count, price }
-    const key = ingredientsKeys[id]; // 'bacon'
+  for (const id in pizzaStore.selectedIngredients) {
+    const item = pizzaStore.selectedIngredients[id];
+    const key = ingredientsKeys[id];
     for (let i = 0; i < item.count; i++) {
       keys.push(key);
     }
@@ -87,52 +80,50 @@ const ingredientsForPizza = computed(() => {
   return keys;
 });
 
-const currentSizeKey = computed(() => sizesKeys[selectedSize.value.id]);
-const currentSauceKey = computed(() => saucesKeys[selectedSauce.value.id]);
-
-const price = computed(() => {
-  const ingredientsPrice = Object.values(selectedIngredients.value).reduce(
-    (acc, { count, price }) => (acc += count * price),
-    0,
-  );
-
-  const fullPrice =
-    selectedSize.value.multiplier *
-    (selectedSauce.value.price + selectedDough.value.price + ingredientsPrice);
-
-  return Math.round(fullPrice);
+const currentSizeKey = computed(() => {
+  if (!pizzaStore.selectedSize) return "";
+  return sizesKeys[pizzaStore.selectedSize.id];
 });
 
-const ingredientsMap = computed(() =>
-  ingredientList.reduce(
-    (acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    },
-    {} as Record<number, Ingredient>,
-  ),
-);
+const currentSauceKey = computed(() => {
+  if (!pizzaStore.selectedSauce) return "";
+  return saucesKeys[pizzaStore.selectedSauce.id];
+});
+
+const updateIngredients = (ingredients: Record<number, { count: number; price: number }>) => {
+  for (const id in ingredients) {
+    const { count, price } = ingredients[id];
+    pizzaStore.setIngredientCount(Number(id), count, price);
+  }
+  for (const id in pizzaStore.selectedIngredients) {
+    if (!ingredients[Number(id)]) {
+      pizzaStore.setIngredientCount(Number(id), 0, 0);
+    }
+  }
+};
 
 const onAddIngredient = (ingredientId: number) => {
-  const currentIngredient = ingredientsMap.value[ingredientId];
+  const ingredient = dataStore.getIngredientById(ingredientId);
+  if (ingredient) {
+    pizzaStore.addIngredient(ingredientId, ingredient.price);
+  }
+};
 
-  if (!currentIngredient) {
-    console.error("Ингредиент не найден:", ingredientId);
+const onAddToCart = () => {
+  if (!pizzaStore.selectedDough || !pizzaStore.selectedSize || !pizzaStore.selectedSauce) {
     return;
   }
 
-  const newSelectedIngredients = { ...selectedIngredients.value };
+  cartStore.addPizza({
+    name: pizzaStore.pizzaName || "Пицца",
+    dough: pizzaStore.selectedDough,
+    size: pizzaStore.selectedSize,
+    sauce: pizzaStore.selectedSauce,
+    ingredients: pizzaStore.selectedIngredients,
+    price: pizzaStore.pizzaPrice,
+  });
 
-  if (newSelectedIngredients[ingredientId]) {
-    newSelectedIngredients[ingredientId].count++;
-  } else {
-    newSelectedIngredients[ingredientId] = {
-      count: 1,
-      price: currentIngredient.price,
-    };
-  }
-
-  selectedIngredients.value = newSelectedIngredients;
+  pizzaStore.resetPizza();
 };
 </script>
 

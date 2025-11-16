@@ -23,7 +23,7 @@ import { ref, computed } from "vue";
 import { Sauce } from "@/types";
 
 interface Props {
-  modelValue: Sauce;
+  modelValue: Sauce | null;
   sauceList: Sauce[];
 }
 
@@ -45,10 +45,13 @@ const saucesMap = ref(
 
 const selectedSauceId = computed({
   get() {
-    return props.modelValue.id;
+    return props.modelValue?.id ?? 0;
   },
   set(id) {
-    emit("update:modelValue", saucesMap.value[id]);
+    const sauce = saucesMap.value[id];
+    if (sauce) {
+      emit("update:modelValue", sauce);
+    }
   },
 });
 </script>
