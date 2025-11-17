@@ -1,5 +1,5 @@
 <template>
-  <form action="test.html" method="post" class="layout-form">
+  <form @submit.prevent="handleSubmit" class="layout-form">
     <main class="content cart">
       <div class="container">
         <div class="cart__title">
@@ -180,30 +180,39 @@
       </div>
 
       <div class="footer__submit">
-        <button type="submit" class="button">Оформить заказ</button>
+        <button type="submit" class="button" :disabled="isSubmitting || cartStore.isEmpty">
+          {{ isSubmitting ? "Отправка..." : "Оформить заказ" }}
+        </button>
       </div>
     </section>
+    <OrderSuccessPopup v-model="showSuccessPopup" />
   </form>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
 import { useDataStore } from "@/stores/data";
 import { useProfileStore } from "@/stores/profile";
 import { useAuthStore } from "@/stores/auth";
-import { AddressesService, API_BASE_URL } from "@/services";
+import { AddressesService, OrdersService, API_BASE_URL } from "@/services";
 import type { CartPizza } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
+import OrderSuccessPopup from "@/common/components/order-success-popup/OrderSuccessPopup.vue";
 
+const router = useRouter();
 const cartStore = useCartStore();
 const dataStore = useDataStore();
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
 const addressesService = new AddressesService(API_BASE_URL);
+const ordersService = new OrdersService(API_BASE_URL);
 
 const deliveryType = ref<string>("pickup");
 const phone = ref<string>("");
+const showSuccessPopup = ref(false);
+const isSubmitting = ref(false);
 const newAddress = ref({
   name: "",
   street: "",
@@ -266,6 +275,99 @@ const getIngredientsList = (pizza: CartPizza) => {
     }
   }
   return ingredients;
+};
+
+const handleSubmit = async () => {
+  if (cartStore.isEmpty || isSubmitting.value) {
+    return;
+  }
+
+  // Валидация телефона
+  if (!phone.value || !phone.value.trim()) {
+    alert("Пожалуйста, укажите контактный телефон");
+    return;
+  }
+
+  // Валидация адреса, если требуется доставка
+  let addressData = null;
+  if (deliveryType.value === "new") {
+    if (!newAddress.value.name?.trim() || !newAddress.value.street?.trim() || !newAddress.value.building?.trim()) {
+      alert("Пожалуйста, заполните все обязательные поля адреса");
+      return;
+    }
+    addressData = {
+      name: newAddress.value.name.trim(),
+      street: newAddress.value.street.trim(),
+      building: newAddress.value.building.trim(),
+      flat: newAddress.value.flat?.trim() || undefined,
+      comment: newAddress.value.comment?.trim() || undefined,
+    };
+  } else if (deliveryType.value.startsWith("address-")) {
+    const addressId = parseInt(deliveryType.value.replace("address-", ""));
+    const address = profileStore.getAddressById(addressId);
+    if (address) {
+      addressData = {
+        name: address.name,
+        street: address.street,
+        building: address.building,
+        flat: address.flat || undefined,
+        comment: address.comment || undefined,
+      };
+    }
+  }
+
+  // Если не самовывоз и адрес не указан
+  if (deliveryType.value !== "pickup" && !addressData) {
+    alert("Пожалуйста, выберите или введите адрес доставки");
+    return;
+  }
+
+  isSubmitting.value = true;
+
+  try {
+    // Формируем данные для заказа
+    const orderData = {
+      phone: phone.value.trim(),
+      pizzas: cartStore.pizzas.map((pizza) => ({
+        name: pizza.name,
+        sizeId: pizza.size.id!,
+        doughId: pizza.dough.id!,
+        sauceId: pizza.sauce.id!,
+        quantity: pizza.quantity,
+        ingredients: Object.entries(pizza.ingredients).map(([ingredientId, item]) => ({
+          ingredientId: Number(ingredientId),
+          quantity: item.count,
+        })),
+      })),
+      misc: cartStore.misc.map((item) => ({
+        miscId: item.misc.id!,
+        quantity: item.quantity,
+      })),
+      address: addressData || {
+        name: "Самовывоз",
+        street: "-",
+        building: "-",
+      },
+    };
+
+    // Отправляем заказ
+    await ordersService.create(orderData);
+
+    // Очищаем корзину
+    cartStore.clearCart();
+
+    // Показываем попап успеха
+    showSuccessPopup.value = true;
+  } catch (error: any) {
+    console.error("Ошибка при оформлении заказа:", error);
+    const errorMessage = error.response?.data?.error?.message 
+      || error.response?.data?.message
+      || error.message
+      || "Произошла ошибка при оформлении заказа. Попробуйте еще раз.";
+    alert(errorMessage);
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 
