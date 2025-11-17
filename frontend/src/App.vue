@@ -6,24 +6,12 @@
 import { onMounted } from "vue";
 import { useDataStore } from "@/stores/data";
 import { useAuthStore } from "@/stores/auth";
-import doughJson from "@/mocks/dough.json";
-import sizesJson from "@/mocks/sizes.json";
-import saucesJson from "@/mocks/sauces.json";
-import ingredientsJson from "@/mocks/ingredients.json";
-import miscJson from "@/mocks/misc.json";
-import type { Dough, Size, Sauce, Ingredient, Misc } from "@/types";
 
 const dataStore = useDataStore();
 const authStore = useAuthStore();
 
-onMounted(() => {
-  dataStore.setAllData({
-    dough: doughJson as Dough[],
-    sizes: sizesJson as Size[],
-    sauces: saucesJson as Sauce[],
-    ingredients: ingredientsJson as Ingredient[],
-    misc: miscJson as Misc[],
-  });
+onMounted(async () => {
+  await dataStore.loadAllData();
 
   authStore.checkAuth();
   if (authStore.isAuthenticated) {

@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, watch } from "vue";
 import saucesKeys from "@/common/data/sauces";
 import ingredientsKeys from "@/common/data/ingredients";
 import sizesKeys from "@/common/data/sizes";
@@ -65,8 +65,19 @@ const dataStore = useDataStore();
 const cartStore = useCartStore();
 
 onMounted(() => {
-  pizzaStore.initDefaultValues();
+  if (dataStore.isDataLoaded) {
+    pizzaStore.initDefaultValues();
+  }
 });
+
+watch(
+  () => dataStore.isDataLoaded,
+  (isLoaded) => {
+    if (isLoaded && !pizzaStore.selectedDough && !pizzaStore.selectedSize && !pizzaStore.selectedSauce) {
+      pizzaStore.initDefaultValues();
+    }
+  }
+);
 
 const ingredientsForPizza = computed(() => {
   const keys: string[] = [];

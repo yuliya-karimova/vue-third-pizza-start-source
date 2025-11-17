@@ -1,5 +1,13 @@
 import { defineStore } from "pinia";
 import type { Dough, Size, Sauce, Ingredient, Misc } from "@/types";
+import {
+  DoughService,
+  SizesService,
+  SaucesService,
+  IngredientsService,
+  MiscService,
+  API_BASE_URL,
+} from "@/services";
 
 export const useDataStore = defineStore("data", {
   state: () => ({
@@ -8,6 +16,8 @@ export const useDataStore = defineStore("data", {
     sauces: [] as Sauce[],
     ingredients: [] as Ingredient[],
     misc: [] as Misc[],
+    isLoading: false,
+    error: null as string | null,
   }),
 
   getters: {
@@ -47,6 +57,32 @@ export const useDataStore = defineStore("data", {
   },
 
   actions: {
+    async loadAllData() {
+      this.isLoading = true;
+      this.error = null;
+
+      try {
+        const [dough, sizes, sauces, ingredients, misc] = await Promise.all([
+          new DoughService(API_BASE_URL).findAll(),
+          new SizesService(API_BASE_URL).findAll(),
+          new SaucesService(API_BASE_URL).findAll(),
+          new IngredientsService(API_BASE_URL).findAll(),
+          new MiscService(API_BASE_URL).findAll(),
+        ]);
+
+        this.dough = dough;
+        this.sizes = sizes;
+        this.sauces = sauces;
+        this.ingredients = ingredients;
+        this.misc = misc;
+      } catch (error: any) {
+        this.error = error.message || "Ошибка при загрузке данных";
+        console.error("Ошибка загрузки данных:", error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
     setDough(dough: Dough[]) {
       this.dough = dough;
     },

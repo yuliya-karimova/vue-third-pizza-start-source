@@ -70,7 +70,7 @@
           <ul class="additional-list">
             <li v-for="item in cartStore.misc" :key="item.misc.id" class="additional-list__item sheet">
               <p class="additional-list__description">
-                <img :src="`@/assets/img/${item.misc.image}`" width="39" height="60" :alt="item.misc.name" />
+                <img :src="getImageUrl(item.misc.image)" width="39" height="60" :alt="item.misc.name" />
                 <span>{{ item.misc.name }}</span>
               </p>
 
@@ -172,6 +172,7 @@
 import { useCartStore } from "@/stores/cart";
 import { useDataStore } from "@/stores/data";
 import type { CartPizza } from "@/stores/cart";
+import { getImageUrl } from "@/utils/images";
 
 const cartStore = useCartStore();
 const dataStore = useDataStore();
