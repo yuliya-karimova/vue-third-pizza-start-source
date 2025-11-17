@@ -27,17 +27,22 @@ export const usePizzaStore = defineStore("pizza", {
       );
     },
 
-    pizzaPrice(): number {
-      if (!this.selectedSize || !this.selectedSauce || !this.selectedDough) {
+    pizzaPrice(state): number {
+      if (!state.selectedSize || !state.selectedSauce || !state.selectedDough) {
         return 0;
       }
 
-      const basePrice =
-        this.selectedSauce.price +
-        this.selectedDough.price +
-        this.ingredientsPrice;
+      const ingredientsPrice = Object.values(state.selectedIngredients).reduce(
+        (acc, { count, price }) => acc + count * price,
+        0,
+      );
 
-      return Math.round(this.selectedSize.multiplier * basePrice);
+      const basePrice =
+        state.selectedSauce.price +
+        state.selectedDough.price +
+        ingredientsPrice;
+
+      return Math.round(state.selectedSize.multiplier * basePrice);
     },
 
     hasAllRequiredFields: (state) => {
@@ -88,6 +93,7 @@ export const usePizzaStore = defineStore("pizza", {
     },
 
     setSize(size: Size) {
+      console.log("🚀 ~ size:", size)
       this.selectedSize = size;
     },
 

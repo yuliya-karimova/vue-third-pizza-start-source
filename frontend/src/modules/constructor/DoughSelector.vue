@@ -7,7 +7,7 @@
         <label
           v-for="dough in doughList"
           :key="dough.id"
-          :class="`dough__input dough__input--${doughKeys[dough.id]}`"
+          :class="`dough__input dough__input--${dough.key || ''}`"
         >
           <input
             v-model="selectedDoughId"
@@ -31,7 +31,6 @@ import { Dough } from "@/types";
 interface Props {
   modelValue: Dough | null;
   doughList: Dough[];
-  doughKeys: Record<number, string>;
 }
 
 const props = defineProps<Props>();

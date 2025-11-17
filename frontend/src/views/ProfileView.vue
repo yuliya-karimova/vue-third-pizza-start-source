@@ -12,6 +12,9 @@
     <div class="layout__content">
       <div class="layout__title">
         <h1 class="title title--big">Мои данные</h1>
+        <div class="layout__tabs">
+          <button type="button" class="layout__tab layout__tab--active">Мои данные</button>
+        </div>
       </div>
 
       <div class="user">
@@ -131,7 +134,7 @@
         </form>
       </div>
 
-      <div v-if="!editingAddress" class="layout__button">
+      <div v-if="!editingAddress && profileStore.addresses.length > 0" class="layout__button">
         <button type="button" class="button button--border" @click="addNewAddress">
           Добавить новый адрес
         </button>
@@ -162,7 +165,14 @@ const addressForm = ref({
 });
 
 onMounted(async () => {
-  if (authStore.isAuthenticated && profileStore.hasProfile) {
+  // Если пользователь аутентифицирован, загружаем адреса
+  // fetchUser() уже должен быть вызван в App.vue
+  if (authStore.isAuthenticated) {
+    // Если пользователь еще не загружен, ждем его загрузки
+    // fetchUser() имеет защиту от повторных вызовов, так что безопасно вызывать
+    if (!authStore.user && !authStore.isLoading) {
+      await authStore.fetchUser();
+    }
     await loadAddresses();
   }
 });
@@ -171,6 +181,10 @@ const loadAddresses = async () => {
   try {
     const addresses = await addressesService.findAll();
     profileStore.addresses = addresses;
+    // Показываем форму сразу, если нет адресов
+    if (addresses.length === 0) {
+      addNewAddress();
+    }
   } catch (error) {
     console.error("Ошибка загрузки адресов:", error);
   }

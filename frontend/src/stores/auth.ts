@@ -72,6 +72,12 @@ export const useAuthStore = defineStore("auth", {
         return;
       }
 
+      // Защита от повторных вызовов: если уже загружается или уже загружен, не делаем запрос
+      if (this.isLoading || this.user) {
+        return;
+      }
+
+      this.isLoading = true;
       try {
         const user = await authService.whoAmI();
         this.user = user;
@@ -81,6 +87,8 @@ export const useAuthStore = defineStore("auth", {
         profileStore.setProfile(user.id, user.name, user.email, user.phone, user.avatar);
       } catch (error) {
         this.logout();
+      } finally {
+        this.isLoading = false;
       }
     },
 

@@ -11,11 +11,16 @@
     <div class="header__user">
       <template v-if="authStore.isAuthenticated && authStore.user">
         <router-link to="/profile" class="header__user-name">
-          {{ authStore.user.name }}
+          <img
+            v-if="authStore.user.avatar"
+            :src="getAvatarUrl(authStore.user.avatar)"
+            :alt="authStore.user.name"
+          />
+          <span>{{ authStore.user.name }}</span>
         </router-link>
-        <button type="button" class="header__logout" @click="handleLogout">
-          Выйти
-        </button>
+        <a href="#" class="header__logout" @click.prevent="handleLogout">
+          <span>Выйти</span>
+        </a>
       </template>
       <router-link v-else to="/login" class="header__login">
         <span>Войти</span>
@@ -30,12 +35,18 @@ import { useRouter } from "vue-router";
 import logo from "@/assets/img/logo.svg";
 import { useCartStore } from "@/stores/cart";
 import { useAuthStore } from "@/stores/auth";
+import { getImageUrl } from "@/utils/images";
 
 const router = useRouter();
 const cartStore = useCartStore();
 const authStore = useAuthStore();
 
 const totalPrice = computed(() => cartStore.totalPrice);
+
+const getAvatarUrl = (avatar: string | undefined): string => {
+  if (!avatar) return "";
+  return getImageUrl(avatar);
+};
 
 const handleLogout = async () => {
   await authStore.logout();

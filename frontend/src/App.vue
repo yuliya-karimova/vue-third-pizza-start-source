@@ -14,8 +14,10 @@ onMounted(async () => {
   await dataStore.loadAllData();
 
   authStore.checkAuth();
-  if (authStore.isAuthenticated) {
-    authStore.fetchUser();
+  // checkAuth() уже вызывает fetchUser() если нужно (асинхронно)
+  // Ждем загрузки пользователя, если он аутентифицирован
+  if (authStore.isAuthenticated && !authStore.user) {
+    await authStore.fetchUser();
   }
 });
 </script>

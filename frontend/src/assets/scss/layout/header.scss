@@ -20,7 +20,6 @@
 }
 
 .header__cart {
-  margin-right: 10px;
   margin-left: auto;
 
   a {
@@ -121,6 +120,16 @@
 
     background: url(../../img/login.svg) no-repeat center;
     background-size: auto 50%;
+  }
+
+  span {
+    @include ds-typography.r-s14-h16;
+
+    display: inline-block;
+
+    vertical-align: middle;
+
+    color: ds-colors.$white;
   }
 }
 

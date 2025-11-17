@@ -71,7 +71,9 @@ export class SizeController {
     },
   })
   async find(): Promise<Size[]> {
-    return this.sizeRepository.find();
+    return this.sizeRepository.find({
+      order: ['multiplier ASC'],
+    });
   }
 
   // @patch('/sizes')

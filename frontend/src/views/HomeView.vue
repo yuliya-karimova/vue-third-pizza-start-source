@@ -6,20 +6,17 @@
         <DoughSelector
           :model-value="pizzaStore.selectedDough"
           :dough-list="dataStore.dough"
-          :dough-keys="doughKeys"
           @update:model-value="(dough) => pizzaStore.setDough(dough)"
         />
         <SizeSelector
           :model-value="pizzaStore.selectedSize"
           :size-list="dataStore.sizes"
-          :sizes-keys="sizesKeys"
           @update:model-value="(size) => pizzaStore.setSize(size)"
         />
 
         <IngredientsSelector
           :model-value="pizzaStore.selectedIngredients"
           :ingredient-list="dataStore.ingredients"
-          :ingredients-keys="ingredientsKeys"
           @update:model-value="updateIngredients"
         >
           <SaucesSelector
@@ -47,10 +44,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import saucesKeys from "@/common/data/sauces";
-import ingredientsKeys from "@/common/data/ingredients";
-import sizesKeys from "@/common/data/sizes";
-import doughKeys from "@/common/data/dough";
 import { usePizzaStore } from "@/stores/pizza";
 import { useDataStore } from "@/stores/data";
 import { useCartStore } from "@/stores/cart";
@@ -83,9 +76,12 @@ const ingredientsForPizza = computed(() => {
   const keys: string[] = [];
   for (const id in pizzaStore.selectedIngredients) {
     const item = pizzaStore.selectedIngredients[id];
-    const key = ingredientsKeys[id];
-    for (let i = 0; i < item.count; i++) {
-      keys.push(key);
+    const ingredient = dataStore.getIngredientById(Number(id));
+    const key = ingredient?.key;
+    if (key) {
+      for (let i = 0; i < item.count; i++) {
+        keys.push(key);
+      }
     }
   }
   return keys;
@@ -93,12 +89,12 @@ const ingredientsForPizza = computed(() => {
 
 const currentSizeKey = computed(() => {
   if (!pizzaStore.selectedSize) return "";
-  return sizesKeys[pizzaStore.selectedSize.id];
+  return pizzaStore.selectedSize.key || "";
 });
 
 const currentSauceKey = computed(() => {
   if (!pizzaStore.selectedSauce) return "";
-  return saucesKeys[pizzaStore.selectedSauce.id];
+  return pizzaStore.selectedSauce.key || "";
 });
 
 const updateIngredients = (ingredients: Record<number, { count: number; price: number }>) => {
