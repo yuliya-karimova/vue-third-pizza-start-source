@@ -109,42 +109,60 @@
 
         <div class="cart__form">
           <div class="cart-form">
-            <label class="cart-form__select">
-              <span class="cart-form__label">Получение заказа:</span>
+            <label class="input input--big-label">
+              <span>Получение заказа:</span>
 
-              <select name="test" class="select">
-                <option value="1">Заберу сам</option>
-                <option value="2">Новый адрес</option>
-                <option value="3">Дом</option>
+              <select v-model="deliveryType" name="delivery" class="select">
+                <option value="pickup">Заберу сам</option>
+                <option value="new">Новый адрес</option>
+                <option v-for="address in profileStore.addresses" :key="address.id" :value="`address-${address.id}`">
+                  {{ address.name }}
+                </option>
               </select>
             </label>
 
             <label class="input input--big-label">
               <span>Контактный телефон:</span>
-              <input type="text" name="tel" placeholder="+7 999-999-99-99" />
+              <input v-model="phone" type="text" name="tel" placeholder="+7 999-999-99-99" />
             </label>
 
-            <div class="cart-form__address">
-              <span class="cart-form__label">Новый адрес:</span>
+            <div v-if="deliveryType === 'new'" class="cart-form__address">
+              <div class="cart-form__label">Новый адрес:</div>
+
+              <div class="cart-form__address-wrapper">
+                <div class="cart-form__input">
+                  <label class="input">
+                    <span>Название адреса*</span>
+                    <input v-model="newAddress.name" type="text" name="addr-name" placeholder="Введите название адреса" required />
+                  </label>
+                </div>
+  
+                <div class="cart-form__input">
+                  <label class="input">
+                    <span>Улица*</span>
+                    <input v-model="newAddress.street" type="text" name="street" placeholder="Введите название улицы" required />
+                  </label>
+                </div>
+  
+                <div class="cart-form__input cart-form__input--small">
+                  <label class="input">
+                    <span>Дом*</span>
+                    <input v-model="newAddress.building" type="text" name="house" placeholder="Введите номер дома" required />
+                  </label>
+                </div>
+  
+                <div class="cart-form__input cart-form__input--small">
+                  <label class="input">
+                    <span>Квартира</span>
+                    <input v-model="newAddress.flat" type="text" name="apartment" placeholder="Введите № квартиры" />
+                  </label>
+                </div>
+              </div>
 
               <div class="cart-form__input">
                 <label class="input">
-                  <span>Улица*</span>
-                  <input type="text" name="street" />
-                </label>
-              </div>
-
-              <div class="cart-form__input cart-form__input--small">
-                <label class="input">
-                  <span>Дом*</span>
-                  <input type="text" name="house" />
-                </label>
-              </div>
-
-              <div class="cart-form__input cart-form__input--small">
-                <label class="input">
-                  <span>Квартира</span>
-                  <input type="text" name="apartment" />
+                  <span>Комментарий</span>
+                  <input v-model="newAddress.comment" type="text" name="comment" placeholder="Введите комментарий" />
                 </label>
               </div>
             </div>
@@ -169,13 +187,71 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
 import { useCartStore } from "@/stores/cart";
 import { useDataStore } from "@/stores/data";
+import { useProfileStore } from "@/stores/profile";
+import { useAuthStore } from "@/stores/auth";
+import { AddressesService, API_BASE_URL } from "@/services";
 import type { CartPizza } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
 
 const cartStore = useCartStore();
 const dataStore = useDataStore();
+const profileStore = useProfileStore();
+const authStore = useAuthStore();
+const addressesService = new AddressesService(API_BASE_URL);
+
+const deliveryType = ref<string>("pickup");
+const phone = ref<string>("");
+const newAddress = ref({
+  name: "",
+  street: "",
+  building: "",
+  flat: "",
+  comment: "",
+});
+
+// Функция для предзаполнения телефона
+const updatePhone = () => {
+  if (authStore.isAuthenticated) {
+    if (profileStore.hasProfile && profileStore.phone) {
+      phone.value = profileStore.phone;
+    } else if (authStore.user?.phone) {
+      phone.value = authStore.user.phone;
+    }
+  }
+};
+
+// Реактивно отслеживаем изменения пользователя и профиля
+watch(
+  () => [authStore.user, profileStore.phone, authStore.isAuthenticated],
+  () => {
+    updatePhone();
+  },
+  { immediate: true }
+);
+
+onMounted(async () => {
+  // Если пользователь аутентифицирован, загружаем его данные
+  if (authStore.isAuthenticated) {
+    // Если пользователь еще не загружен, ждем его загрузки
+    if (!authStore.user && !authStore.isLoading) {
+      await authStore.fetchUser();
+    }
+    
+    // Предзаполняем телефон (на случай если watch не сработал)
+    updatePhone();
+    
+    // Загружаем адреса пользователя
+    try {
+      const addresses = await addressesService.findAll();
+      profileStore.addresses = addresses;
+    } catch (error) {
+      console.error("Ошибка загрузки адресов:", error);
+    }
+  }
+});
 
 const getPizzaDescription = (pizza: CartPizza) => {
   return `${pizza.size.name}, на ${pizza.dough.name.toLowerCase()} тесте`;
