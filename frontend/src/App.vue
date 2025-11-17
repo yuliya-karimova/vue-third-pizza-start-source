@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useDataStore } from "@/stores/data";
+import { useAuthStore } from "@/stores/auth";
 import doughJson from "@/mocks/dough.json";
 import sizesJson from "@/mocks/sizes.json";
 import saucesJson from "@/mocks/sauces.json";
@@ -13,6 +14,7 @@ import miscJson from "@/mocks/misc.json";
 import type { Dough, Size, Sauce, Ingredient, Misc } from "@/types";
 
 const dataStore = useDataStore();
+const authStore = useAuthStore();
 
 onMounted(() => {
   dataStore.setAllData({
@@ -22,6 +24,11 @@ onMounted(() => {
     ingredients: ingredientsJson as Ingredient[],
     misc: miscJson as Misc[],
   });
+
+  authStore.checkAuth();
+  if (authStore.isAuthenticated) {
+    authStore.fetchUser();
+  }
 });
 </script>
 

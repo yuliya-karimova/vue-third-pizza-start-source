@@ -7,5 +7,6 @@ export { IngredientsService } from "./ingredients.service";
 export { MiscService } from "./misc.service";
 export { AddressesService } from "./addresses.service";
 export { OrdersService } from "./orders.service";
+export { AuthService } from "./auth.service";
 export { API_BASE_URL } from "./config";
 
