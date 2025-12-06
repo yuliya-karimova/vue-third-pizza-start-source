@@ -1,7 +1,7 @@
 <template>
   <AppHeader />
   <router-view v-slot="{ Component, route }">
-    <Transition name="slide" mode="out-in">
+    <Transition name="fade" mode="out-in">
       <component :is="Component" :key="route.path" />
     </Transition>
   </router-view>

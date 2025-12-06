@@ -1,10 +1,6 @@
 <template>
   <main class="layout">
     <div class="layout__sidebar sidebar">
-      <router-link to="/" class="logo layout__logo">
-        <img src="@/assets/img/logo.svg" alt="V!U!E! Pizza logo" width="90" height="40" />
-      </router-link>
-
       <router-link to="/orders" class="layout__link layout__link--active">История заказов</router-link>
       <router-link to="/profile" class="layout__link">Мои данные</router-link>
     </div>
@@ -48,7 +44,17 @@
         <ul v-if="order.orderPizzas && order.orderPizzas.length > 0" class="order__list">
           <li v-for="pizza in order.orderPizzas" :key="pizza.id" class="order__item">
             <div class="product">
-              <img src="@/assets/img/product.svg" class="product__img" width="56" height="56" :alt="pizza.name" />
+              <div class="product__img product__img--pizza">
+                <div :class="`pizza pizza--foundation--${getOrderPizzaSizeKey(pizza)}-${getOrderPizzaSauceKey(pizza)}`">
+                  <div class="pizza__wrapper">
+                    <div
+                      v-for="(key, index) in getOrderPizzaIngredientsKeys(pizza)"
+                      :key="`${key}-${index}`"
+                      :class="`pizza__filling pizza__filling--${key}`"
+                    />
+                  </div>
+                </div>
+              </div>
               <div class="product__text">
                 <h2>{{ pizza.name }}</h2>
                 <ul>
@@ -216,6 +222,36 @@ const getMiscImageUrl = (miscId: number): string => {
   return getImageUrl(misc.image);
 };
 
+// Получаем ключ размера для визуализации пиццы из заказа
+const getOrderPizzaSizeKey = (pizza: OrderPizza): string => {
+  const size = dataStore.getSizeById(pizza.sizeId);
+  return size?.key || "";
+};
+
+// Получаем ключ соуса для визуализации пиццы из заказа
+const getOrderPizzaSauceKey = (pizza: OrderPizza): string => {
+  const sauce = dataStore.getSauceById(pizza.sauceId);
+  return sauce?.key || "";
+};
+
+// Получаем массив ключей ингредиентов для визуализации пиццы из заказа
+const getOrderPizzaIngredientsKeys = (pizza: OrderPizza): string[] => {
+  const keys: string[] = [];
+  if (pizza.ingredients && pizza.ingredients.length > 0) {
+    pizza.ingredients.forEach((ing: { ingredientId: number; quantity: number }) => {
+      const ingredient = dataStore.getIngredientById(ing.ingredientId);
+      const key = ingredient?.key;
+      if (key) {
+        // Добавляем ключ столько раз, сколько раз добавлен ингредиент
+        for (let i = 0; i < ing.quantity; i++) {
+          keys.push(key);
+        }
+      }
+    });
+  }
+  return keys;
+};
+
 const formatAddress = (order: Order): string => {
   if (!order.orderAddress) {
     // Проверяем, есть ли адрес в заказе, но с именем "Самовывоз" или пустыми полями
@@ -349,6 +385,7 @@ const deleteOrder = async (order: Order) => {
 @use "@/assets/scss/blocks/title";
 @use "@/assets/scss/blocks/button";
 @use "@/assets/scss/blocks/product";
+@use "@/assets/scss/blocks/pizza";
 @use "@/assets/scss/blocks/order";
 @use "@/assets/scss/blocks/logo";
 @use "@/assets/scss/layout/layout";
