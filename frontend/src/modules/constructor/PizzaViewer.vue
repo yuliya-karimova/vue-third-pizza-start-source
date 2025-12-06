@@ -17,9 +17,14 @@
         <div class="pizza__wrapper">
           <TransitionGroup name="scale" tag="div">
             <div
-              v-for="(key, index) in ingredientsForPizza"
-              :key="`${key}-${index}`"
-              :class="`pizza__filling pizza__filling--${key}`"
+              v-for="(ingredient, index) in ingredientsForPizza"
+              :key="`${ingredient.key}-${index}`"
+              :class="[
+                'pizza__filling',
+                `pizza__filling--${ingredient.key}`,
+                ingredient.count === 2 ? 'pizza__filling--second' : '',
+                ingredient.count === 3 ? 'pizza__filling--third' : ''
+              ]"
             />
           </TransitionGroup>
         </div>
@@ -48,11 +53,16 @@ import UiInput from "@/common/components/text-input";
 import { flyToCart } from "@/utils/flyToCart";
 import productImage from "@/assets/img/product.svg";
 
+interface IngredientDisplay {
+  key: string;
+  count: number;
+}
+
 interface Props {
   modelValue: string;
   sizeKey: string;
   sauceKey: string;
-  ingredientsForPizza: string[];
+  ingredientsForPizza: IngredientDisplay[];
   price: number;
   isReady?: boolean;
 }
@@ -87,6 +97,7 @@ const onPizzaDrop = (event: DragEvent) => {
     const ingredientId = Number(event.dataTransfer.getData("ingredientId"));
 
     if (!isNaN(ingredientId) && ingredientId > 0) {
+      // Проверка на максимум будет в обработчике addIngredient в HomeView
       emit("addIngredient", ingredientId);
     }
   }

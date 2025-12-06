@@ -26,6 +26,7 @@
               <AppCounter
                 :model-value="countMap[ingredient.id] || 0"
                 :min-value="0"
+                :max-value="3"
                 @update:model-value="updateIngredientCount(ingredient, $event)"
               />
             </li>
@@ -76,6 +77,13 @@ const updateIngredientCount = (ingredient: Ingredient, newCount: number) => {
 };
 
 const onIngredientDragStart = (event: DragEvent, ingredient: Ingredient) => {
+  // Блокируем drag-n-drop если ингредиент уже достиг максимума (3)
+  const currentCount = countMap.value[ingredient.id] || 0;
+  if (currentCount >= 3) {
+    event.preventDefault();
+    return;
+  }
+  
   if (event.dataTransfer) {
     event.dataTransfer.setData("ingredientId", String(ingredient.id));
     event.dataTransfer.effectAllowed = "copy";

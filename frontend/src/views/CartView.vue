@@ -17,9 +17,14 @@
                 <div :class="`pizza pizza--foundation--${getPizzaSizeKey(pizza)}-${getPizzaSauceKey(pizza)}`">
                   <div class="pizza__wrapper">
                     <div
-                      v-for="(key, index) in getPizzaIngredientsKeys(pizza)"
-                      :key="`${key}-${index}`"
-                      :class="`pizza__filling pizza__filling--${key}`"
+                      v-for="(ingredient, index) in getPizzaIngredientsKeys(pizza)"
+                      :key="`${ingredient.key}-${index}`"
+                      :class="[
+                        'pizza__filling',
+                        `pizza__filling--${ingredient.key}`,
+                        ingredient.count === 2 ? 'pizza__filling--second' : '',
+                        ingredient.count === 3 ? 'pizza__filling--third' : ''
+                      ]"
                     />
                   </div>
                 </div>
@@ -67,6 +72,15 @@
               <b>{{ pizza.price * pizza.quantity }} ₽</b>
             </div>
 
+            <div class="cart-list__button">
+              <button
+                type="button"
+                class="cart-list__edit"
+                @click="editPizza(pizza)"
+              >
+                Изменить
+              </button>
+            </div>
             <div class="cart-list__button">
               <button
                 type="button"
@@ -211,6 +225,7 @@ import { useCartStore } from "@/stores/cart";
 import { useDataStore } from "@/stores/data";
 import { useProfileStore } from "@/stores/profile";
 import { useAuthStore } from "@/stores/auth";
+import { usePizzaStore } from "@/stores/pizza";
 import { AddressesService, OrdersService, API_BASE_URL } from "@/services";
 import type { CartPizza } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
@@ -221,6 +236,7 @@ const cartStore = useCartStore();
 const dataStore = useDataStore();
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
+const pizzaStore = usePizzaStore();
 const addressesService = new AddressesService(API_BASE_URL);
 const ordersService = new OrdersService(API_BASE_URL);
 
@@ -309,21 +325,36 @@ const getPizzaSauceKey = (pizza: CartPizza): string => {
   return pizza.sauce?.key || "";
 };
 
-// Получаем массив ключей ингредиентов для визуализации пиццы
-const getPizzaIngredientsKeys = (pizza: CartPizza): string[] => {
-  const keys: string[] = [];
+// Получаем массив объектов ингредиентов для визуализации пиццы (с правильными классами --second и --third)
+const getPizzaIngredientsKeys = (pizza: CartPizza): Array<{ key: string; count: number }> => {
+  const ingredients: Array<{ key: string; count: number }> = [];
   for (const id in pizza.ingredients) {
     const item = pizza.ingredients[id];
     const ingredient = dataStore.getIngredientById(Number(id));
     const key = ingredient?.key;
-    if (key) {
-      // Добавляем ключ столько раз, сколько раз добавлен ингредиент
-      for (let i = 0; i < item.count; i++) {
-        keys.push(key);
-      }
+    if (key && item.count > 0) {
+      ingredients.push({ key, count: item.count });
     }
   }
-  return keys;
+  return ingredients;
+};
+
+// Редактирование пиццы - перенос параметров в конструктор и переход на главную
+const editPizza = (pizza: CartPizza) => {
+  // Устанавливаем все параметры пиццы в конструктор
+  pizzaStore.setDough(pizza.dough);
+  pizzaStore.setSize(pizza.size);
+  pizzaStore.setSauce(pizza.sauce);
+  pizzaStore.setPizzaName(pizza.name);
+  
+  // Устанавливаем ингредиенты
+  pizzaStore.selectedIngredients = { ...pizza.ingredients };
+  
+  // Удаляем пиццу из корзины
+  cartStore.removePizza(pizza.id);
+  
+  // Переходим на главную страницу
+  router.push("/");
 };
 
 const handleSubmit = async () => {

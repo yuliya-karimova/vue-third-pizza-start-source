@@ -106,6 +106,12 @@ export const usePizzaStore = defineStore("pizza", {
     },
 
     addIngredient(ingredientId: number, price: number) {
+      // Проверяем максимум (3)
+      const currentCount = this.selectedIngredients[ingredientId]?.count || 0;
+      if (currentCount >= 3) {
+        return; // Не добавляем если достигнут максимум
+      }
+      
       if (this.selectedIngredients[ingredientId]) {
         this.selectedIngredients[ingredientId].count++;
       } else {

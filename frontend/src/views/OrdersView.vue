@@ -48,9 +48,14 @@
                 <div :class="`pizza pizza--foundation--${getOrderPizzaSizeKey(pizza)}-${getOrderPizzaSauceKey(pizza)}`">
                   <div class="pizza__wrapper">
                     <div
-                      v-for="(key, index) in getOrderPizzaIngredientsKeys(pizza)"
-                      :key="`${key}-${index}`"
-                      :class="`pizza__filling pizza__filling--${key}`"
+                      v-for="(ingredient, index) in getOrderPizzaIngredientsKeys(pizza)"
+                      :key="`${ingredient.key}-${index}`"
+                      :class="[
+                        'pizza__filling',
+                        `pizza__filling--${ingredient.key}`,
+                        ingredient.count === 2 ? 'pizza__filling--second' : '',
+                        ingredient.count === 3 ? 'pizza__filling--third' : ''
+                      ]"
                     />
                   </div>
                 </div>
@@ -234,22 +239,19 @@ const getOrderPizzaSauceKey = (pizza: OrderPizza): string => {
   return sauce?.key || "";
 };
 
-// Получаем массив ключей ингредиентов для визуализации пиццы из заказа
-const getOrderPizzaIngredientsKeys = (pizza: OrderPizza): string[] => {
-  const keys: string[] = [];
+// Получаем массив объектов ингредиентов для визуализации пиццы из заказа (с правильными классами --second и --third)
+const getOrderPizzaIngredientsKeys = (pizza: OrderPizza): Array<{ key: string; count: number }> => {
+  const ingredients: Array<{ key: string; count: number }> = [];
   if (pizza.ingredients && pizza.ingredients.length > 0) {
     pizza.ingredients.forEach((ing: { ingredientId: number; quantity: number }) => {
       const ingredient = dataStore.getIngredientById(ing.ingredientId);
       const key = ingredient?.key;
-      if (key) {
-        // Добавляем ключ столько раз, сколько раз добавлен ингредиент
-        for (let i = 0; i < ing.quantity; i++) {
-          keys.push(key);
-        }
+      if (key && ing.quantity > 0) {
+        ingredients.push({ key, count: ing.quantity });
       }
     });
   }
-  return keys;
+  return ingredients;
 };
 
 const formatAddress = (order: Order): string => {

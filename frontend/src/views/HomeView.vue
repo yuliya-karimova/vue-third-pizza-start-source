@@ -72,19 +72,18 @@ watch(
   }
 );
 
+// Формируем массив объектов ингредиентов для отображения с правильными классами
 const ingredientsForPizza = computed(() => {
-  const keys: string[] = [];
+  const ingredients: Array<{ key: string; count: number }> = [];
   for (const id in pizzaStore.selectedIngredients) {
     const item = pizzaStore.selectedIngredients[id];
     const ingredient = dataStore.getIngredientById(Number(id));
     const key = ingredient?.key;
-    if (key) {
-      for (let i = 0; i < item.count; i++) {
-        keys.push(key);
-      }
+    if (key && item.count > 0) {
+      ingredients.push({ key, count: item.count });
     }
   }
-  return keys;
+  return ingredients;
 });
 
 const currentSizeKey = computed(() => {
@@ -110,6 +109,12 @@ const updateIngredients = (ingredients: Record<number, { count: number; price: n
 };
 
 const onAddIngredient = (ingredientId: number) => {
+  // Проверяем, не достиг ли ингредиент максимума (3)
+  const currentCount = pizzaStore.selectedIngredients[ingredientId]?.count || 0;
+  if (currentCount >= 3) {
+    return; // Блокируем добавление если достигнут максимум
+  }
+  
   const ingredient = dataStore.getIngredientById(ingredientId);
   if (ingredient) {
     pizzaStore.addIngredient(ingredientId, ingredient.price);
