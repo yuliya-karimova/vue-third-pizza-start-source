@@ -93,12 +93,13 @@
           </li>
         </TransitionGroup>
 
-        <div v-if="cartStore.hasMisc" class="cart__additional">
+        <div class="cart__additional">
+          <h2 class="title title--small">Дополнительно</h2>
           <ul class="additional-list">
-            <li v-for="item in cartStore.misc" :key="item.misc.id" class="additional-list__item sheet">
+            <li v-for="misc in dataStore.misc" :key="misc.id" class="additional-list__item sheet">
               <p class="additional-list__description">
-                <img :src="getImageUrl(item.misc.image)" width="39" height="60" :alt="item.misc.name" />
-                <span>{{ item.misc.name }}</span>
+                <img :src="getImageUrl(misc.image)" width="39" height="60" :alt="misc.name" />
+                <span>{{ misc.name }}</span>
               </p>
 
               <div class="additional-list__wrapper">
@@ -106,7 +107,8 @@
                   <button
                     type="button"
                     class="counter__button counter__button--minus"
-                    @click="cartStore.decreaseMiscQuantity(item.misc.id)"
+                    :disabled="!getMiscQuantityInCart(misc.id)"
+                    @click="cartStore.decreaseMiscQuantity(misc.id)"
                   >
                     <span class="visually-hidden">Меньше</span>
                   </button>
@@ -114,20 +116,20 @@
                     type="text"
                     name="counter"
                     class="counter__input"
-                    :value="item.quantity"
+                    :value="getMiscQuantityInCart(misc.id)"
                     readonly
                   />
                   <button
                     type="button"
                     class="counter__button counter__button--plus counter__button--orange"
-                    @click="cartStore.increaseMiscQuantity(item.misc.id)"
+                    @click="cartStore.addMisc(misc, 1)"
                   >
                     <span class="visually-hidden">Больше</span>
                   </button>
                 </div>
 
                 <div class="additional-list__price">
-                  <b>× {{ item.misc.price }} ₽</b>
+                  <b>{{ (misc.price * getMiscQuantityInCart(misc.id)).toLocaleString("ru-RU") }} ₽</b>
                 </div>
               </div>
             </li>
@@ -337,6 +339,12 @@ const getPizzaIngredientsKeys = (pizza: CartPizza): Array<{ key: string; count: 
     }
   }
   return ingredients;
+};
+
+// Получаем количество дополнительного товара в корзине
+const getMiscQuantityInCart = (miscId: number): number => {
+  const item = cartStore.misc.find((item) => item.misc.id === miscId);
+  return item?.quantity || 0;
 };
 
 // Редактирование пиццы - перенос параметров в конструктор и переход на главную

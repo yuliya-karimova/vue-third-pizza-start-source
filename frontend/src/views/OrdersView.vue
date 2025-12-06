@@ -81,7 +81,9 @@
             <img :src="getMiscImageUrl(misc.miscId)" width="20" height="30" :alt="dataStore.getMiscById(misc.miscId)?.name || ''" />
             <p>
               <span>{{ dataStore.getMiscById(misc.miscId)?.name || "Неизвестно" }}</span>
-              <b>{{ (dataStore.getMiscById(misc.miscId)?.price || 0) * misc.quantity }} ₽</b>
+              <b>
+                <span v-if="misc.quantity > 1">{{ misc.quantity }}×{{ dataStore.getMiscById(misc.miscId)?.price || 0 }}=</span>{{ (dataStore.getMiscById(misc.miscId)?.price || 0) * misc.quantity }} ₽
+              </b>
             </p>
           </li>
         </ul>
