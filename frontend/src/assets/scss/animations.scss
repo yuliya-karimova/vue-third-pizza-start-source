@@ -1,0 +1,252 @@
+// Анимации для приложения
+
+// Fade анимация (для попапа)
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-enter-active {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.fade-leave-active {
+  animation: fadeOut 0.3s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// Slide анимация (для переходов между маршрутами)
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.slide-enter-active {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.slide-leave-active {
+  animation: slideOutLeft 0.4s ease-out;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+// Scale анимация (для ингредиентов в пицце)
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.scale-enter-active {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scale-enter-from {
+  transform: scale(0);
+  opacity: 0;
+}
+
+// Дополнительные анимации
+
+// Fade-in с небольшим смещением (для элементов списка)
+@keyframes fadeInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in-up-enter-active {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.fade-in-up-enter-from {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
+.fade-in-up-leave-active {
+  transition: all 0.3s ease-out;
+}
+
+.fade-in-up-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+// Bounce анимация (для добавления в корзину)
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40%, 43% {
+    transform: translateY(-10px);
+  }
+  70% {
+    transform: translateY(-5px);
+  }
+  90% {
+    transform: translateY(-2px);
+  }
+}
+
+.bounce {
+  animation: bounce 0.6s ease-out;
+}
+
+// Pulse анимация (для важных элементов)
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.pulse {
+  animation: pulse 0.6s ease-out;
+}
+
+// Slide down (для формы адреса)
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.slide-down-enter-active {
+  animation: slideDown 0.3s ease-out;
+  overflow: hidden;
+}
+
+.slide-down-leave-active {
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+// Rotate анимация (для иконок при загрузке)
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotate {
+  animation: rotate 1s linear infinite;
+}
+
+// Shake анимация (для ошибок валидации)
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-out;
+}
+
+// Fly to cart анимация (для полета пиццы к корзине)
+@keyframes flyToCart {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(var(--fly-x), var(--fly-y)) translate(-50%, -50%) scale(0.8) rotate(180deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--fly-x), var(--fly-y)) translate(-50%, -50%) scale(0.3) rotate(360deg);
+    opacity: 0.5;
+  }
+}
+
+.flying-pizza {
+  will-change: transform, opacity;
+}

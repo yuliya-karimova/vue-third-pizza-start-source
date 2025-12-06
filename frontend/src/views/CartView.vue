@@ -10,7 +10,7 @@
           <p>В корзине нет ни одного товара</p>
         </div>
 
-        <ul v-else class="cart-list sheet">
+        <TransitionGroup v-else name="fade-in-up" tag="ul" class="cart-list sheet">
           <li v-for="pizza in cartStore.pizzas" :key="pizza.id" class="cart-list__item">
             <div class="product cart-list__product">
               <img src="@/assets/img/product.svg" class="product__img" width="56" height="56" :alt="pizza.name" />
@@ -64,7 +64,7 @@
               </button>
             </div>
           </li>
-        </ul>
+        </TransitionGroup>
 
         <div v-if="cartStore.hasMisc" class="cart__additional">
           <ul class="additional-list">
@@ -126,7 +126,8 @@
               <input v-model="phone" type="text" name="tel" placeholder="+7 999-999-99-99" />
             </label>
 
-            <div v-if="deliveryType === 'new'" class="cart-form__address">
+            <Transition name="slide-down">
+              <div v-if="deliveryType === 'new'" class="cart-form__address">
               <div class="cart-form__label">Новый адрес:</div>
 
               <div class="cart-form__address-wrapper">
@@ -165,7 +166,8 @@
                   <input v-model="newAddress.comment" type="text" name="comment" placeholder="Введите комментарий" />
                 </label>
               </div>
-            </div>
+              </div>
+            </Transition>
           </div>
         </div>
       </div>

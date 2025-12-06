@@ -26,7 +26,8 @@
         У вас пока нет заказов
       </div>
 
-      <section v-for="order in orders" :key="order.id" class="sheet order">
+      <TransitionGroup name="fade-in-up" tag="div">
+        <section v-for="order in orders" :key="order.id" class="sheet order">
         <div class="order__wrapper">
           <div class="order__number">
             <b>Заказ #{{ order.id }}</b>
@@ -76,6 +77,7 @@
 
         <p class="order__address">Адрес доставки: {{ formatAddress(order) }}</p>
       </section>
+      </TransitionGroup>
     </div>
   </main>
 </template>
