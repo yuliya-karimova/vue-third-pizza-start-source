@@ -10,7 +10,7 @@
         </div>
         <p>Мы начали готовить Ваш заказ, скоро привезём его вам ;)</p>
         <div class="popup__button">
-          <router-link to="/orders" class="button" @click="handleClose">Отлично, я жду!</router-link>
+          <router-link :to="redirectTo" class="button" @click="handleClose">Отлично, я жду!</router-link>
         </div>
       </div>
     </div>
@@ -22,9 +22,12 @@ import { computed } from "vue";
 
 interface Props {
   modelValue: boolean;
+  redirectTo?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  redirectTo: "/orders",
+});
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;

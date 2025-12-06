@@ -1,8 +1,8 @@
 <template>
   <main class="layout">
     <div class="layout__sidebar sidebar">
-      <router-link to="/orders" class="layout__link layout__link--active">История заказов</router-link>
-      <router-link to="/profile" class="layout__link">Мои данные</router-link>
+      <router-link to="/orders" :class="['layout__link', { 'layout__link--active': $route.path === '/orders' }]">История заказов</router-link>
+      <router-link to="/profile" :class="['layout__link', { 'layout__link--active': $route.path === '/profile' }]">Мои данные</router-link>
     </div>
 
     <div class="layout__content">
