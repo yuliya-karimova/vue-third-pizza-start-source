@@ -10,7 +10,7 @@
         </div>
         <p>Мы начали готовить Ваш заказ, скоро привезём его вам ;)</p>
         <div class="popup__button">
-          <router-link to="/" class="button" @click="handleClose">Отлично, я жду!</router-link>
+          <router-link to="/orders" class="button" @click="handleClose">Отлично, я жду!</router-link>
         </div>
       </div>
     </div>

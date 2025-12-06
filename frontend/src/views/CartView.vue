@@ -13,7 +13,17 @@
         <TransitionGroup v-else name="fade-in-up" tag="ul" class="cart-list sheet">
           <li v-for="pizza in cartStore.pizzas" :key="pizza.id" class="cart-list__item">
             <div class="product cart-list__product">
-              <img src="@/assets/img/product.svg" class="product__img" width="56" height="56" :alt="pizza.name" />
+              <div class="product__img product__img--pizza">
+                <div :class="`pizza pizza--foundation--${getPizzaSizeKey(pizza)}-${getPizzaSauceKey(pizza)}`">
+                  <div class="pizza__wrapper">
+                    <div
+                      v-for="(key, index) in getPizzaIngredientsKeys(pizza)"
+                      :key="`${key}-${index}`"
+                      :class="`pizza__filling pizza__filling--${key}`"
+                    />
+                  </div>
+                </div>
+              </div>
               <div class="product__text">
                 <h2>{{ pizza.name }}</h2>
                 <ul>
@@ -21,6 +31,9 @@
                   <li>Соус: {{ pizza.sauce.name }}</li>
                   <li v-if="getIngredientsList(pizza).length > 0">
                     Начинка: {{ getIngredientsList(pizza).join(", ") }}
+                  </li>
+                  <li v-else class="product__text--empty">
+                    Начинка не добавлена
                   </li>
                 </ul>
               </div>
@@ -192,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
 import { useDataStore } from "@/stores/data";
@@ -271,12 +284,46 @@ const getPizzaDescription = (pizza: CartPizza) => {
 const getIngredientsList = (pizza: CartPizza) => {
   const ingredients: string[] = [];
   for (const id in pizza.ingredients) {
+    const item = pizza.ingredients[id];
     const ingredient = dataStore.getIngredientById(Number(id));
-    if (ingredient) {
-      ingredients.push(ingredient.name.toLowerCase());
+    if (ingredient && item.count > 0) {
+      // Если ингредиент добавлен несколько раз, показываем количество
+      const name = ingredient.name.toLowerCase();
+      if (item.count > 1) {
+        ingredients.push(`${name} ×${item.count}`);
+      } else {
+        ingredients.push(name);
+      }
     }
   }
   return ingredients;
+};
+
+// Получаем ключ размера для визуализации пиццы
+const getPizzaSizeKey = (pizza: CartPizza): string => {
+  return pizza.size?.key || "";
+};
+
+// Получаем ключ соуса для визуализации пиццы
+const getPizzaSauceKey = (pizza: CartPizza): string => {
+  return pizza.sauce?.key || "";
+};
+
+// Получаем массив ключей ингредиентов для визуализации пиццы
+const getPizzaIngredientsKeys = (pizza: CartPizza): string[] => {
+  const keys: string[] = [];
+  for (const id in pizza.ingredients) {
+    const item = pizza.ingredients[id];
+    const ingredient = dataStore.getIngredientById(Number(id));
+    const key = ingredient?.key;
+    if (key) {
+      // Добавляем ключ столько раз, сколько раз добавлен ингредиент
+      for (let i = 0; i < item.count; i++) {
+        keys.push(key);
+      }
+    }
+  }
+  return keys;
 };
 
 const handleSubmit = async () => {
@@ -353,7 +400,8 @@ const handleSubmit = async () => {
     };
 
     // Отправляем заказ
-    await ordersService.create(orderData);
+    const createdOrder = await ordersService.create(orderData);
+    console.log("Заказ создан:", createdOrder);
 
     // Очищаем корзину
     cartStore.clearCart();
@@ -385,6 +433,7 @@ const handleSubmit = async () => {
 @use "@/assets/scss/blocks/cart-form";
 @use "@/assets/scss/blocks/additional-list";
 @use "@/assets/scss/blocks/footer";
+@use "@/assets/scss/blocks/pizza";
 @use "@/assets/scss/layout/container";
 @use "@/assets/scss/layout/content";
 @use "@/assets/scss/layout/layout-form";

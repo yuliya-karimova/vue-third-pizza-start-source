@@ -38,10 +38,10 @@
           </div>
 
           <div class="order__button">
-            <button type="button" class="button button--border">Удалить</button>
+            <button type="button" class="button button--border" @click="deleteOrder(order)">Удалить</button>
           </div>
           <div class="order__button">
-            <button type="button" class="button">Повторить</button>
+            <button type="button" class="button" @click="repeatOrder(order)">Повторить</button>
           </div>
         </div>
 
@@ -84,14 +84,18 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { OrdersService, API_BASE_URL } from "@/services";
 import type { Order, OrderPizza, OrderMisc } from "@/services/orders.service";
 import { useAuthStore } from "@/stores/auth";
 import { useDataStore } from "@/stores/data";
+import { useCartStore } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
 
+const router = useRouter();
 const authStore = useAuthStore();
 const dataStore = useDataStore();
+const cartStore = useCartStore();
 const ordersService = new OrdersService(API_BASE_URL);
 
 const orders = ref<Order[]>([]);
@@ -213,12 +217,25 @@ const getMiscImageUrl = (miscId: number): string => {
 };
 
 const formatAddress = (order: Order): string => {
-  if (!order.orderAddress) return "Адрес не указан";
+  if (!order.orderAddress) {
+    // Проверяем, есть ли адрес в заказе, но с именем "Самовывоз" или пустыми полями
+    // Если addressId не указан, значит самовывоз
+    if (!order.addressId) {
+      return "Самовывоз";
+    }
+    return "Адрес не указан";
+  }
   
   const addr = order.orderAddress;
+  
+  // Если адрес называется "Самовывоз" или имеет пустые поля street/building
+  if (addr.name === "Самовывоз" || (addr.street === "-" && addr.building === "-")) {
+    return "Самовывоз";
+  }
+  
   let address = addr.name;
   
-  if (addr.street && addr.building) {
+  if (addr.street && addr.building && addr.street !== "-" && addr.building !== "-") {
     address += ` (${addr.street}, д. ${addr.building}`;
     if (addr.flat) {
       address += `, кв. ${addr.flat}`;
@@ -227,6 +244,104 @@ const formatAddress = (order: Order): string => {
   }
   
   return address;
+};
+
+const repeatOrder = (order: Order) => {
+  if (!order.orderPizzas && (!order.orderMisc || order.orderMisc.length === 0)) {
+    alert("Заказ пустой, нечего повторять");
+    return;
+  }
+
+  // Добавляем пиццы из заказа в корзину
+  if (order.orderPizzas && order.orderPizzas.length > 0) {
+    order.orderPizzas.forEach((pizza: OrderPizza) => {
+      const dough = dataStore.getDoughById(pizza.doughId);
+      const size = dataStore.getSizeById(pizza.sizeId);
+      const sauce = dataStore.getSauceById(pizza.sauceId);
+
+      if (!dough || !size || !sauce) {
+        console.warn(`Не найдены данные для пиццы: dough=${pizza.doughId}, size=${pizza.sizeId}, sauce=${pizza.sauceId}`);
+        return;
+      }
+
+      // Формируем объект ингредиентов
+      const ingredients: Record<number, { count: number; price: number }> = {};
+      if (pizza.ingredients && pizza.ingredients.length > 0) {
+        pizza.ingredients.forEach((ing: { ingredientId: number; quantity: number }) => {
+          const ingredient = dataStore.getIngredientById(ing.ingredientId);
+          if (ingredient) {
+            ingredients[ing.ingredientId] = {
+              count: ing.quantity,
+              price: ingredient.price,
+            };
+          }
+        });
+      }
+
+      // Рассчитываем цену пиццы
+      let price = sauce.price + dough.price;
+      Object.values(ingredients).forEach((ing) => {
+        price += ing.price * ing.count;
+      });
+      price = Math.round(size.multiplier * price);
+
+      // Добавляем пиццу в корзину
+      cartStore.addPizza({
+        name: pizza.name,
+        dough,
+        size,
+        sauce,
+        ingredients,
+        price,
+      });
+      
+      // Устанавливаем правильное количество для только что добавленной пиццы
+      // Находим последнюю добавленную пиццу с таким же содержимым
+      const addedPizza = cartStore.pizzas[cartStore.pizzas.length - 1];
+      if (addedPizza && pizza.quantity > 1) {
+        cartStore.updatePizzaQuantity(addedPizza.id, pizza.quantity);
+      }
+    });
+  }
+
+  // Добавляем дополнительные товары (misc) из заказа в корзину
+  if (order.orderMisc && order.orderMisc.length > 0) {
+    order.orderMisc.forEach((miscOrder: OrderMisc) => {
+      const misc = dataStore.getMiscById(miscOrder.miscId);
+      if (misc) {
+        cartStore.addMisc(misc, miscOrder.quantity);
+      }
+    });
+  }
+
+  // Переходим на страницу корзины
+  router.push("/cart");
+};
+
+const deleteOrder = async (order: Order) => {
+  if (!order.id) {
+    return;
+  }
+
+  if (!confirm(`Вы уверены, что хотите удалить заказ #${order.id}?`)) {
+    return;
+  }
+
+  try {
+    await ordersService.deleteById(order.id);
+    // Удаляем заказ из списка
+    const index = orders.value.findIndex((o) => o.id === order.id);
+    if (index !== -1) {
+      orders.value.splice(index, 1);
+    }
+  } catch (error: any) {
+    console.error("Ошибка при удалении заказа:", error);
+    const errorMessage = error.response?.data?.error?.message 
+      || error.response?.data?.message
+      || error.message
+      || "Произошла ошибка при удалении заказа";
+    alert(errorMessage);
+  }
 };
 </script>
 

@@ -85,5 +85,9 @@ export class OrdersService extends HttpService {
   async create(data: CreateOrderDto): Promise<Order> {
     return this.post<Order>("/orders", data);
   }
+
+  async deleteById(id: number): Promise<void> {
+    return this.delete<void>(`/orders/${id}`);
+  }
 }
 

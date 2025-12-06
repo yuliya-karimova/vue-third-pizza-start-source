@@ -25,6 +25,9 @@ import {
   PizzaRepository
 } from '../repositories';
 import {authenticate} from "@loopback/authentication";
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
+import {inject} from '@loopback/core';
+import {HttpErrors} from '@loopback/rest';
 
 export class OrderController {
   constructor(
@@ -38,8 +41,11 @@ export class OrderController {
     public pizzaIngredientRepository : PizzaIngredientRepository,
     @repository(PizzaRepository)
     public pizzaRepository : PizzaRepository,
+    @inject(SecurityBindings.USER, {optional: true})
+    private user: UserProfile,
   ) {}
 
+  @authenticate('jwt')
   @post('/orders')
   @response(201, {
     description: 'Order model instance',
@@ -57,7 +63,6 @@ export class OrderController {
         'application/json': {
           schema: {
             example: {
-              "userId": "string",
               "phone": "+7 999-999-99-99",
               "address": {
                 "street": "string",
@@ -94,36 +99,87 @@ export class OrderController {
     order: Omit<Order, 'id'>,
   ): Promise<Order> {
     const { address, pizzas, misc, ...orderToSave } = order;
-    const userId = order.userId;
-    // it can be: 1) existing address with id, 2) a new address without id, 3) null if user takes order himself
+    // Получаем userId из JWT токена
+    const userId = this.user?.[securityId] || order.userId;
+    
+    if (!userId) {
+      console.error('User not authenticated. User profile:', this.user);
+      throw new HttpErrors.Unauthorized('Пользователь не авторизован. userId не найден.');
+    }
+    
+    console.log('Creating order for userId:', userId);
+    console.log('Order data:', { pizzas: pizzas?.length, misc: misc?.length, address, phone: orderToSave.phone });
+    // it can be: 1) existing address with id, 2) a new address without id, 3) null/undefined if user takes order himself
     let addressId = address?.id;
-    // if it is a new address
-    if (address && !addressId) {
-      const name = `ул.${address.street}, д.${address.building}, кв.${address.flat}`;
+    // if it is a new address (and not self-pickup)
+    if (address && !addressId && address.name !== "Самовывоз") {
+      const name = address.name || `ул.${address.street}, д.${address.building}${address.flat ? `, кв.${address.flat}` : ''}`;
       const newAddress = await this.addressRepository.create({...address, name, userId});
       addressId = newAddress.id;
+      console.log('New address created with id:', addressId);
+    } else if (address?.name === "Самовывоз") {
+      // Для самовывоза не создаем адрес
+      addressId = undefined;
+      console.log('Self-pickup order, no address needed');
     }
-    const newOrder = await this.orderRepository.create({...orderToSave, addressId});
+    // Сохраняем userId в заказе
+    const newOrder = await this.orderRepository.create({...orderToSave, addressId, userId});
+    console.log('Order created with id:', newOrder.id);
+    
+    if (!newOrder.id) {
+      throw new Error('Не удалось создать заказ. ID не был сгенерирован.');
+    }
+    
+    // Создаем пиццы
     for (const pizza of pizzas) {
       const { ingredients, ...pizzaToSave } = pizza;
       const newPizza = await this.pizzaRepository.create({
         ...pizzaToSave,
         orderId: newOrder.id
       });
+      console.log('Pizza created with id:', newPizza.id);
+      
+      // Создаем ингредиенты для пиццы
       for (const ingredient of ingredients) {
         await this.pizzaIngredientRepository.create({
           ...ingredient,
           pizzaId: newPizza.id
-        })
+        });
       }
     }
-    for (const item of misc) {
-      await this.miscOrderRepository.create({
-        ...item,
-        orderId: newOrder.id
-      })
+    
+    // Создаем дополнительные товары (misc)
+    if (misc && misc.length > 0) {
+      for (const item of misc) {
+        await this.miscOrderRepository.create({
+          ...item,
+          orderId: newOrder.id
+        });
+      }
     }
-    return newOrder;
+    
+    // Возвращаем созданный заказ с полными данными
+    const filter = {
+      "include": [
+        {
+          "relation": "orderPizzas",
+          "scope": {
+            "include": [
+              {
+                "relation": "ingredients"
+              }
+            ]
+          }
+        },
+        {
+          "relation": "orderMisc"
+        },
+        {
+          "relation": "orderAddress"
+        }
+      ]
+    };
+    return this.orderRepository.findById(newOrder.id!, filter);
   }
 
   @oas.visibility(OperationVisibility.UNDOCUMENTED)
@@ -195,7 +251,17 @@ export class OrderController {
     },
   })
   async find(): Promise<Order[]> {
+    // Получаем userId текущего пользователя из JWT токена
+    const userId = this.user?.[securityId];
+    
+    if (!userId) {
+      return [];
+    }
+    
     const filter = {
+      "where": {
+        "userId": userId
+      },
       "include": [
         {
           "relation": "orderPizzas",
@@ -213,10 +279,11 @@ export class OrderController {
         {
           "relation": "orderAddress"
         }
-      ]
-    }
+      ],
+      "order": ["id DESC"]
+    };
     const orders = await this.orderRepository.find(filter);
-    return orders.filter(order => !!order.userId);
+    return orders;
   }
 
   @oas.visibility(OperationVisibility.UNDOCUMENTED)

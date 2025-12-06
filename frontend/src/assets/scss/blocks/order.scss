@@ -46,14 +46,15 @@
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
+  gap: 30px;
 
-  margin-top: 24px;
-  padding-right: 10px;
-  padding-left: 10px;
+  padding: 24px;
 }
 
 .order__item {
   display: flex;
+  gap: 15px;
+  justify-content: space-between;
 
   width: 310px;
   margin-right: 33px;
