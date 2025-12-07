@@ -55,4 +55,17 @@
       white-space: nowrap;
     }
   }
+
+  &--error {
+    input {
+      border-color: #c62828;
+    }
+  }
+}
+
+.input__error {
+  display: block;
+  margin-top: 5px;
+  color: #c62828;
+  font-size: 12px;
 }

@@ -156,7 +156,18 @@
 
             <label class="input input--big-label">
               <span>Контактный телефон:</span>
-              <input v-model="phone" type="text" name="tel" placeholder="+7 999-999-99-99" />
+              <input
+                :value="phoneInput.phone"
+                type="text"
+                name="tel"
+                placeholder="+7 999-999-99-99"
+                :class="{ 'input--error': phoneInput.error && phoneInput.touched }"
+                @input="phoneInput.handleInput"
+                @blur="phoneInput.handleBlur"
+              />
+              <span v-if="phoneInput.error && phoneInput.touched" class="input__error">
+                {{ phoneInput.error }}
+              </span>
             </label>
 
             <Transition name="slide-down">
@@ -287,6 +298,8 @@ import OrderSuccessPopup from "@/common/components/order-success-popup/OrderSucc
 import { useToast } from "@/composables/useToast";
 import { logger } from "@/utils/logger";
 import { LoadingSpinner } from "@/common/components/loading-spinner";
+import { usePhoneInput } from "@/composables/usePhoneInput";
+import { formatPhoneNumber } from "@/utils/phone";
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -299,7 +312,7 @@ const ordersService = new OrdersService(API_BASE_URL);
 const toast = useToast();
 
 const deliveryType = ref<string>("pickup");
-const phone = ref<string>("");
+const phoneInput = usePhoneInput("");
 const showSuccessPopup = ref(false);
 const isSubmitting = ref(false);
 const newAddress = ref({
@@ -323,9 +336,9 @@ const selectedExistingAddress = computed(() => {
 const updatePhone = () => {
   if (authStore.isAuthenticated) {
     if (profileStore.hasProfile && profileStore.phone) {
-      phone.value = profileStore.phone;
+      phoneInput.setValue(profileStore.phone);
     } else if (authStore.user?.phone) {
-      phone.value = authStore.user.phone;
+      phoneInput.setValue(authStore.user.phone);
     }
   }
 };
@@ -436,8 +449,11 @@ const handleSubmit = async () => {
   }
 
   // Валидация телефона
-  if (!phone.value || !phone.value.trim()) {
-    toast.warning("Пожалуйста, укажите контактный телефон");
+  if (!phoneInput.validate()) {
+    phoneInput.touched = true;
+    if (phoneInput.error) {
+      toast.warning(phoneInput.error);
+    }
     return;
   }
 
@@ -487,7 +503,7 @@ const handleSubmit = async () => {
       // Для авторизованного пользователя - отправляем на backend
       // Формируем данные для заказа
       const orderData = {
-        phone: phone.value.trim(),
+        phone: phoneInput.formattedPhone,
         pizzas: cartStore.pizzas.map((pizza) => ({
           name: pizza.name,
           sizeId: pizza.size.id!,
@@ -561,6 +577,17 @@ const handlePopupClose = (value: boolean) => {
 @use "@/assets/scss/layout/container";
 @use "@/assets/scss/layout/content";
 @use "@/assets/scss/layout/layout-form";
+
+.input--error input {
+  border-color: #c62828;
+}
+
+.input__error {
+  display: block;
+  margin-top: 5px;
+  color: #c62828;
+  font-size: 12px;
+}
 
 .button--loading {
   display: inline-flex;
