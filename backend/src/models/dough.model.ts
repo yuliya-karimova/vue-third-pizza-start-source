@@ -34,6 +34,12 @@ export class Dough extends Entity {
   })
   price: number;
 
+  @property({
+    type: 'string',
+    required: false,
+  })
+  key?: string;
+
   @hasMany(() => Pizza)
   pizzas: Pizza[];
 

@@ -7,6 +7,7 @@ import CartView from "@/views/CartView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import UserView from "@/views/UserView.vue";
 import OrdersView from "@/views/OrdersView.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,16 +30,19 @@ const router = createRouter({
           path: "profile",
           name: "profile",
           component: ProfileView,
+          meta: { requiresAuth: true },
         },
         {
           path: "user",
           name: "user",
           component: UserView,
+          meta: { requiresAuth: true },
         },
         {
           path: "orders",
           name: "orders",
           component: OrdersView,
+          meta: { requiresAuth: true },
         },
       ],
     },
@@ -50,10 +54,25 @@ const router = createRouter({
           path: "",
           name: "login",
           component: LoginView,
+          meta: { requiresGuest: true },
         },
       ],
     },
   ],
+});
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore();
+  
+  authStore.checkAuth();
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next({ name: "login", query: { redirect: to.fullPath } });
+  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    next({ name: "home" });
+  } else {
+    next();
+  }
 });
 
 export default router;

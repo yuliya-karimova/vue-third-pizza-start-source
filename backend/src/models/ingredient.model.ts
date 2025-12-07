@@ -27,6 +27,12 @@ export class Ingredient extends Entity {
   })
   price: number;
 
+  @property({
+    type: 'string',
+    required: false,
+  })
+  key?: string;
+
   constructor(data?: Partial<Ingredient>) {
     super(data);
   }

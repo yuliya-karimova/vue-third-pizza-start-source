@@ -6,17 +6,5 @@
 @use "scaffolding";
 @use "mixins/mixins";
 
-// common components (used in templates: cart.html, orders.html, user-data.html, sign-in.html)
+// common styles
 @use "common";
-
-// layouts
-@use "layout/container";
-@use "layout/content";
-@use "layout/header";
-@use "layout/layout-form";
-@use "layout/layout";
-@use "layout/main";
-@use "layout/popup";
-@use "layout/sheet";
-@use "layout/sidebar";
-@use "layout/sign-form";

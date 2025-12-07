@@ -63,6 +63,35 @@
   margin-bottom: 27px;
 }
 
+.layout__tabs {
+  display: flex;
+  margin-top: 16px;
+}
+
+.layout__tab {
+  @include ds-typography.r-s14-h16;
+
+  padding: 8px 16px;
+  margin-right: 8px;
+
+  cursor: pointer;
+  transition: 0.3s;
+
+  color: ds-colors.$black;
+  border: none;
+  border-radius: 4px;
+  background-color: rgba(ds-colors.$green-500, 0.05);
+
+  &:hover {
+    background-color: rgba(ds-colors.$green-500, 0.1);
+  }
+
+  &--active {
+    background-color: rgba(ds-colors.$green-500, 0.15);
+    color: ds-colors.$green-500;
+  }
+}
+
 .layout__button {
   margin-top: 40px;
 

@@ -7,7 +7,7 @@
         <label
           v-for="size in sizeList"
           :key="size.id"
-          :class="`diameter__input diameter__input--${sizesKeys[size.id]}`"
+          :class="`diameter__input diameter__input--${size.key || ''}`"
         >
           <input
             v-model="selectedSizeId"
@@ -24,13 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { Size } from "@/types";
 
 interface Props {
   modelValue: Size | null;
   sizeList: Size[];
-  sizesKeys: Record<number, string>;
 }
 
 const props = defineProps<Props>();
@@ -39,7 +38,7 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: Size): void;
 }>();
 
-const sizesMap = ref(
+const sizesMap = computed(() =>
   props.sizeList.reduce(
     (acc, item) => {
       acc[item.id] = item;
@@ -54,7 +53,9 @@ const selectedSizeId = computed({
     return props.modelValue?.id ?? 0;
   },
   set(id) {
+    console.log("🚀 ~ id:", id)
     const size = sizesMap.value[id];
+    console.log("🚀 ~ size:", size)
     if (size) {
       emit("update:modelValue", size);
     }

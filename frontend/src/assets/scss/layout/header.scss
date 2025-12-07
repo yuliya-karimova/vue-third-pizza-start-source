@@ -8,7 +8,7 @@
 
   display: flex;
 
-  padding: 0 2.12%;
+  padding: 0 20px;
 
   background-color: ds-colors.$green-500;
   box-shadow: ds-shadows.$shadow-light;
@@ -20,24 +20,25 @@
 }
 
 .header__cart {
-  margin-right: 10px;
   margin-left: auto;
+  display: flex;
+  align-items: stretch;
 
   a {
     @include ds-typography.b-s16-h19;
 
-    display: block;
+    display: flex;
+    align-items: center;
 
-    padding-top: 21px;
-    padding-right: 15px;
-    padding-bottom: 21px;
-    padding-left: 58px;
+    padding: 14px 20px 14px 58px;
 
     transition: 0.3s;
 
+    cursor: pointer;
+
     color: ds-colors.$white;
     background-color: ds-colors.$green-500;
-    background-image: url("@/assets/img/cart.svg");
+    background-image: url(../../img/cart.svg);
     background-repeat: no-repeat;
     background-position: 20px center;
     background-size: 29px 27px;
@@ -62,14 +63,13 @@
 
   a {
     display: block;
-
-    padding-top: 14px;
-    padding-right: 20px;
-    padding-bottom: 14px;
-    padding-left: 20px;
-
+    
+    padding: 14px 20px;
+    
     transition: 0.3s;
-
+    
+    cursor: pointer;
+    
     background-color: ds-colors.$green-500;
 
     &:hover:not(:active) {
@@ -121,6 +121,16 @@
 
     background: url(../../img/login.svg) no-repeat center;
     background-size: auto 50%;
+  }
+
+  span {
+    @include ds-typography.r-s14-h16;
+
+    display: inline-block;
+
+    vertical-align: middle;
+
+    color: ds-colors.$white;
   }
 }
 

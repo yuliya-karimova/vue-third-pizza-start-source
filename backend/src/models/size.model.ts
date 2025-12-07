@@ -28,6 +28,12 @@ export class Size extends Entity {
   })
   multiplier: number;
 
+  @property({
+    type: 'string',
+    required: false,
+  })
+  key?: string;
+
   @hasMany(() => Pizza)
   pizzas: Pizza[];
 

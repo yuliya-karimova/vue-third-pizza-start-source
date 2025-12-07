@@ -5,23 +5,20 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useDataStore } from "@/stores/data";
-import doughJson from "@/mocks/dough.json";
-import sizesJson from "@/mocks/sizes.json";
-import saucesJson from "@/mocks/sauces.json";
-import ingredientsJson from "@/mocks/ingredients.json";
-import miscJson from "@/mocks/misc.json";
-import type { Dough, Size, Sauce, Ingredient, Misc } from "@/types";
+import { useAuthStore } from "@/stores/auth";
 
 const dataStore = useDataStore();
+const authStore = useAuthStore();
 
-onMounted(() => {
-  dataStore.setAllData({
-    dough: doughJson as Dough[],
-    sizes: sizesJson as Size[],
-    sauces: saucesJson as Sauce[],
-    ingredients: ingredientsJson as Ingredient[],
-    misc: miscJson as Misc[],
-  });
+onMounted(async () => {
+  await dataStore.loadAllData();
+
+  authStore.checkAuth();
+  // checkAuth() уже вызывает fetchUser() если нужно (асинхронно)
+  // Ждем загрузки пользователя, если он аутентифицирован
+  if (authStore.isAuthenticated && !authStore.user) {
+    await authStore.fetchUser();
+  }
 });
 </script>
 

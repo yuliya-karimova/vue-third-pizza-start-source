@@ -16,7 +16,7 @@
               class="ingredients__item"
             >
               <span
-                :class="`filling filling--${ingredientsKeys[ingredient.id]}`"
+                :class="`filling filling--${ingredient.key || ''}`"
                 draggable="true"
                 @dragstart="onIngredientDragStart($event, ingredient)"
               >
@@ -44,7 +44,6 @@ import type { Ingredient, IngredientsCounter } from "@/types";
 interface Props {
   modelValue: IngredientsCounter;
   ingredientList: Ingredient[];
-  ingredientsKeys: Record<number, string>;
 }
 
 const props = defineProps<Props>();

@@ -2,6 +2,7 @@ export interface Sauce {
   id: number;
   name: string;
   price: number;
+  key?: string;
 }
 
 export interface Ingredient {
@@ -9,6 +10,7 @@ export interface Ingredient {
   name: string;
   image: string;
   price: number;
+  key?: string;
 }
 
 export interface Size {
@@ -16,6 +18,7 @@ export interface Size {
   name: string;
   image: string;
   multiplier: number;
+  key?: string;
 }
 
 export interface Dough {
@@ -24,6 +27,7 @@ export interface Dough {
   image: string;
   description: string;
   price: number;
+  key?: string;
 }
 
 export interface Misc {
