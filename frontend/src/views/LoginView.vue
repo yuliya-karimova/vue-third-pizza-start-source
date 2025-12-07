@@ -40,8 +40,12 @@
           <span v-if="errors.password" class="input__error">{{ errors.password }}</span>
         </label>
       </div>
-      <button type="submit" class="button" :disabled="authStore.isLoading || !isFormValid">
-        {{ authStore.isLoading ? "Вход..." : "Авторизоваться" }}
+      <button type="submit" class="button button--loading" :disabled="authStore.isLoading || !isFormValid">
+        <template v-if="authStore.isLoading">
+          <LoadingSpinner size="small" :message="''" />
+          <span class="button__text">Вход...</span>
+        </template>
+        <span v-else class="button__text">Авторизоваться</span>
       </button>
     </form>
   </div>
@@ -52,6 +56,7 @@ import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { logger } from "@/utils/logger";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
 
 const router = useRouter();
 const route = useRoute();
@@ -140,6 +145,26 @@ const onSubmit = async () => {
 
 .input--error input {
   border-color: #c62828;
+}
+
+.button--loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  .loading-spinner {
+    padding: 0;
+    
+    &__spinner {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.button__text {
+  margin-left: 0;
 }
 </style>
 

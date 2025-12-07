@@ -255,8 +255,12 @@
       </div>
 
       <div class="footer__submit">
-        <button type="submit" class="button" :disabled="isSubmitting || cartStore.isEmpty">
-          {{ isSubmitting ? "Отправка..." : "Оформить заказ" }}
+        <button type="submit" class="button button--loading" :disabled="isSubmitting || cartStore.isEmpty">
+          <template v-if="isSubmitting">
+            <LoadingSpinner size="small" :message="''" />
+            <span class="button__text">Отправка...</span>
+          </template>
+          <span v-else class="button__text">Оформить заказ</span>
         </button>
       </div>
     </section>
@@ -282,6 +286,7 @@ import { getImageUrl } from "@/utils/images";
 import OrderSuccessPopup from "@/common/components/order-success-popup/OrderSuccessPopup.vue";
 import { useToast } from "@/composables/useToast";
 import { logger } from "@/utils/logger";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -556,5 +561,25 @@ const handlePopupClose = (value: boolean) => {
 @use "@/assets/scss/layout/container";
 @use "@/assets/scss/layout/content";
 @use "@/assets/scss/layout/layout-form";
+
+.button--loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  .loading-spinner {
+    padding: 0;
+    
+    &__spinner {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.button__text {
+  margin-left: 0;
+}
 </style>
 

@@ -23,6 +23,13 @@
         <p class="user__phone">Контактный телефон: <span>{{ profileStore.phone || "Не указан" }}</span></p>
       </div>
 
+      <LoadingSpinner 
+        v-if="isLoadingAddresses" 
+        :visible="isLoadingAddresses"
+        size="medium"
+        message="Загрузка адресов..."
+      />
+
       <div v-for="address in profileStore.addresses" :key="address.id" class="layout__address">
         <div class="sheet address-form">
           <div class="address-form__header">
@@ -147,12 +154,14 @@ import { AddressesService, API_BASE_URL } from "@/services";
 import { getImageUrl } from "@/utils/images";
 import type { Address } from "@/stores/profile";
 import { logger } from "@/utils/logger";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
 
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
 const addressesService = new AddressesService(API_BASE_URL);
 
 const editingAddress = ref<Address | null>(null);
+const isLoadingAddresses = ref(false);
 const addressForm = ref({
   name: "",
   street: "",
@@ -175,6 +184,7 @@ onMounted(async () => {
 });
 
 const loadAddresses = async () => {
+  isLoadingAddresses.value = true;
   try {
     const addresses = await addressesService.findAll();
     profileStore.addresses = addresses;
@@ -184,6 +194,8 @@ const loadAddresses = async () => {
     }
   } catch (error) {
     logger.error("Ошибка загрузки адресов:", error);
+  } finally {
+    isLoadingAddresses.value = false;
   }
 };
 

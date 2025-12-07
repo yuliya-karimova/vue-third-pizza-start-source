@@ -14,9 +14,13 @@
         {{ error }}
       </div>
 
-      <div v-if="isLoading" class="layout__loading">
-        Загрузка заказов...
-      </div>
+      <LoadingSpinner 
+        v-if="isLoading" 
+        :visible="isLoading"
+        size="large"
+        message="Загрузка заказов..."
+        overlay
+      />
 
       <div v-if="!isLoading && orders.length === 0" class="layout__empty">
         У вас пока нет заказов
@@ -120,6 +124,7 @@ import { useModal } from "@/composables/useModal";
 import { useToast } from "@/composables/useToast";
 import { ModalDialog } from "@/common/components/modal-dialog";
 import { logger } from "@/utils/logger";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
 
 const router = useRouter();
 const authStore = useAuthStore();

@@ -1,6 +1,13 @@
 <template>
   <main class="content">
-    <form action="#" method="post">
+    <LoadingSpinner 
+      v-if="dataStore.isLoading" 
+      :visible="dataStore.isLoading"
+      size="large"
+      message="Загрузка данных..."
+      overlay
+    />
+    <form v-else action="#" method="post">
       <div class="content__wrapper">
         <h1 class="title title--big">Конструктор пиццы</h1>
         <DoughSelector
@@ -52,6 +59,7 @@ import SizeSelector from "@/modules/constructor/SizeSelector.vue";
 import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
 import SaucesSelector from "@/modules/constructor/SaucesSelector.vue";
 import PizzaViewer from "@/modules/constructor/PizzaViewer.vue";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
 
 const pizzaStore = usePizzaStore();
 const dataStore = useDataStore();
