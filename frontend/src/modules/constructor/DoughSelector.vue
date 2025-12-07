@@ -29,7 +29,7 @@ import { ref, computed } from "vue";
 import { Dough } from "@/types";
 
 interface Props {
-  modelValue: Dough;
+  modelValue: Dough | null;
   doughList: Dough[];
   doughKeys: Record<number, string>;
 }
@@ -52,10 +52,13 @@ const doughMap = ref(
 
 const selectedDoughId = computed({
   get() {
-    return props.modelValue.id;
+    return props.modelValue?.id ?? 0;
   },
   set(id) {
-    emit("update:modelValue", doughMap.value[id]);
+    const dough = doughMap.value[id];
+    if (dough) {
+      emit("update:modelValue", dough);
+    }
   },
 });
 </script>

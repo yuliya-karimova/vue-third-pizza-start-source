@@ -6,140 +6,101 @@
           <h1 class="title title--big">Корзина</h1>
         </div>
 
-        <!-- <div class="sheet cart__empty">
+        <div v-if="cartStore.isEmpty" class="sheet cart__empty">
           <p>В корзине нет ни одного товара</p>
-        </div> -->
+        </div>
 
-        <ul class="cart-list sheet">
-          <li class="cart-list__item">
+        <ul v-else class="cart-list sheet">
+          <li v-for="pizza in cartStore.pizzas" :key="pizza.id" class="cart-list__item">
             <div class="product cart-list__product">
-              <img src="@/assets/img/product.svg" class="product__img" width="56" height="56" alt="Капричоза" />
+              <img src="@/assets/img/product.svg" class="product__img" width="56" height="56" :alt="pizza.name" />
               <div class="product__text">
-                <h2>Капричоза</h2>
+                <h2>{{ pizza.name }}</h2>
                 <ul>
-                  <li>30 см, на тонком тесте</li>
-                  <li>Соус: томатный</li>
-                  <li>Начинка: грибы, лук, ветчина, пармезан, ананас</li>
+                  <li>{{ getPizzaDescription(pizza) }}</li>
+                  <li>Соус: {{ pizza.sauce.name }}</li>
+                  <li v-if="getIngredientsList(pizza).length > 0">
+                    Начинка: {{ getIngredientsList(pizza).join(", ") }}
+                  </li>
                 </ul>
               </div>
             </div>
 
             <div class="counter cart-list__counter">
-              <button type="button" class="counter__button counter__button--minus">
+              <button
+                type="button"
+                class="counter__button counter__button--minus"
+                @click="cartStore.decreasePizzaQuantity(pizza.id)"
+              >
                 <span class="visually-hidden">Меньше</span>
               </button>
-              <input type="text" name="counter" class="counter__input" value="1" />
-              <button type="button" class="counter__button counter__button--plus counter__button--orange">
+              <input
+                type="text"
+                name="counter"
+                class="counter__input"
+                :value="pizza.quantity"
+                readonly
+              />
+              <button
+                type="button"
+                class="counter__button counter__button--plus counter__button--orange"
+                @click="cartStore.increasePizzaQuantity(pizza.id)"
+              >
                 <span class="visually-hidden">Больше</span>
               </button>
             </div>
 
             <div class="cart-list__price">
-              <b>782 ₽</b>
+              <b>{{ pizza.price * pizza.quantity }} ₽</b>
             </div>
 
             <div class="cart-list__button">
-              <button type="button" class="cart-list__edit">Изменить</button>
-            </div>
-          </li>
-          <li class="cart-list__item">
-            <div class="product cart-list__product">
-              <img src="@/assets/img/product.svg" class="product__img" width="56" height="56" alt="Любимая пицца" />
-              <div class="product__text">
-                <h2>Любимая пицца</h2>
-                <ul>
-                  <li>30 см, на тонком тесте</li>
-                  <li>Соус: томатный</li>
-                  <li>Начинка: грибы, лук, ветчина, пармезан, ананас, бекон, блю чиз</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="counter cart-list__counter">
-              <button type="button" class="counter__button counter__button--minus">
-                <span class="visually-hidden">Меньше</span>
+              <button
+                type="button"
+                class="cart-list__edit"
+                @click="cartStore.removePizza(pizza.id)"
+              >
+                Удалить
               </button>
-              <input type="text" name="counter" class="counter__input" value="2" />
-              <button type="button" class="counter__button counter__button--plus counter__button--orange">
-                <span class="visually-hidden">Больше</span>
-              </button>
-            </div>
-
-            <div class="cart-list__price">
-              <b>782 ₽</b>
-            </div>
-
-            <div class="cart-list__button">
-              <button type="button" class="cart-list__edit">Изменить</button>
             </div>
           </li>
         </ul>
 
-        <div class="cart__additional">
+        <div v-if="cartStore.hasMisc" class="cart__additional">
           <ul class="additional-list">
-            <li class="additional-list__item sheet">
+            <li v-for="item in cartStore.misc" :key="item.misc.id" class="additional-list__item sheet">
               <p class="additional-list__description">
-                <img src="@/assets/img/cola.svg" width="39" height="60" alt="Coca-Cola 0,5 литра" />
-                <span>Coca-Cola 0,5 литра</span>
+                <img :src="`@/assets/img/${item.misc.image}`" width="39" height="60" :alt="item.misc.name" />
+                <span>{{ item.misc.name }}</span>
               </p>
 
               <div class="additional-list__wrapper">
                 <div class="counter additional-list__counter">
-                  <button type="button" class="counter__button counter__button--minus">
+                  <button
+                    type="button"
+                    class="counter__button counter__button--minus"
+                    @click="cartStore.decreaseMiscQuantity(item.misc.id)"
+                  >
                     <span class="visually-hidden">Меньше</span>
                   </button>
-                  <input type="text" name="counter" class="counter__input" value="2" />
-                  <button type="button" class="counter__button counter__button--plus counter__button--orange">
+                  <input
+                    type="text"
+                    name="counter"
+                    class="counter__input"
+                    :value="item.quantity"
+                    readonly
+                  />
+                  <button
+                    type="button"
+                    class="counter__button counter__button--plus counter__button--orange"
+                    @click="cartStore.increaseMiscQuantity(item.misc.id)"
+                  >
                     <span class="visually-hidden">Больше</span>
                   </button>
                 </div>
 
                 <div class="additional-list__price">
-                  <b>× 56 ₽</b>
-                </div>
-              </div>
-            </li>
-            <li class="additional-list__item sheet">
-              <p class="additional-list__description">
-                <img src="@/assets/img/sauce.svg" width="39" height="60" alt="Острый соус" />
-                <span>Острый соус</span>
-              </p>
-
-              <div class="additional-list__wrapper">
-                <div class="counter additional-list__counter">
-                  <button type="button" class="counter__button counter__button--minus">
-                    <span class="visually-hidden">Меньше</span>
-                  </button>
-                  <input type="text" name="counter" class="counter__input" value="2" />
-                  <button type="button" class="counter__button counter__button--plus counter__button--orange">
-                    <span class="visually-hidden">Больше</span>
-                  </button>
-                </div>
-
-                <div class="additional-list__price">
-                  <b>× 30 ₽</b>
-                </div>
-              </div>
-            </li>
-            <li class="additional-list__item sheet">
-              <p class="additional-list__description">
-                <img src="@/assets/img/potato.svg" width="39" height="60" alt="Картошка из печи" />
-                <span>Картошка из печи</span>
-              </p>
-
-              <div class="additional-list__wrapper">
-                <div class="counter additional-list__counter">
-                  <button type="button" class="counter__button counter__button--minus">
-                    <span class="visually-hidden">Меньше</span>
-                  </button>
-                  <input type="text" name="counter" class="counter__input" value="2" />
-                  <button type="button" class="counter__button counter__button--plus counter__button--orange">
-                    <span class="visually-hidden">Больше</span>
-                  </button>
-                </div>
-
-                <div class="additional-list__price">
-                  <b>× 56 ₽</b>
+                  <b>× {{ item.misc.price }} ₽</b>
                 </div>
               </div>
             </li>
@@ -197,7 +158,7 @@
       </div>
       <p class="footer__text">Перейти к конструктору<br />чтоб собрать ещё одну пиццу</p>
       <div class="footer__price">
-        <b>Итого: 2 228 ₽</b>
+        <b>Итого: {{ cartStore.totalPrice }} ₽</b>
       </div>
 
       <div class="footer__submit">
@@ -208,7 +169,27 @@
 </template>
 
 <script setup lang="ts">
-// TODO: Добавить логику работы с корзиной
+import { useCartStore } from "@/stores/cart";
+import { useDataStore } from "@/stores/data";
+import type { CartPizza } from "@/stores/cart";
+
+const cartStore = useCartStore();
+const dataStore = useDataStore();
+
+const getPizzaDescription = (pizza: CartPizza) => {
+  return `${pizza.size.name}, на ${pizza.dough.name.toLowerCase()} тесте`;
+};
+
+const getIngredientsList = (pizza: CartPizza) => {
+  const ingredients: string[] = [];
+  for (const id in pizza.ingredients) {
+    const ingredient = dataStore.getIngredientById(Number(id));
+    if (ingredient) {
+      ingredients.push(ingredient.name.toLowerCase());
+    }
+  }
+  return ingredients;
+};
 </script>
 
 <style lang="scss">

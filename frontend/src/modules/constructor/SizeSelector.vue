@@ -28,7 +28,7 @@ import { ref, computed } from "vue";
 import { Size } from "@/types";
 
 interface Props {
-  modelValue: Size;
+  modelValue: Size | null;
   sizeList: Size[];
   sizesKeys: Record<number, string>;
 }
@@ -51,10 +51,13 @@ const sizesMap = ref(
 
 const selectedSizeId = computed({
   get() {
-    return props.modelValue.id;
+    return props.modelValue?.id ?? 0;
   },
   set(id) {
-    emit("update:modelValue", sizesMap.value[id]);
+    const size = sizesMap.value[id];
+    if (size) {
+      emit("update:modelValue", size);
+    }
   },
 });
 </script>

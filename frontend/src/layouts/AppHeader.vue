@@ -6,7 +6,7 @@
       </router-link>
     </div>
     <div class="header__cart">
-      <router-link to="/cart">0 ₽</router-link>
+      <router-link to="/cart">{{ totalPrice }} ₽</router-link>
     </div>
     <div class="header__user">
       <router-link to="/login" class="header__login"><span>Войти</span></router-link>
@@ -15,7 +15,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import logo from "@/assets/img/logo.svg";
+import { useCartStore } from "@/stores/cart";
+
+const cartStore = useCartStore();
+
+const totalPrice = computed(() => cartStore.totalPrice);
 </script>
 
 <style lang="scss">

@@ -26,7 +26,14 @@
 
     <div class="content__result">
       <p>Итого: {{ price }} ₽</p>
-      <button type="button" class="button" disabled>Готовьте!</button>
+      <button
+        type="button"
+        class="button"
+        :disabled="!isReady"
+        @click="onAddToCart"
+      >
+        Готовьте!
+      </button>
     </div>
   </div>
 </template>
@@ -35,18 +42,22 @@
 import UiInput from "@/common/components/text-input";
 
 interface Props {
-  modelValue: string; // pizza name
+  modelValue: string;
   sizeKey: string;
   sauceKey: string;
   ingredientsForPizza: string[];
   price: number;
+  isReady?: boolean;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  isReady: false,
+});
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
   (e: "addIngredient", ingredientId: number): void;
+  (e: "addToCart"): void;
 }>();
 
 const onNameInput = (value: string) => {
@@ -70,6 +81,10 @@ const onPizzaDrop = (event: DragEvent) => {
       emit("addIngredient", ingredientId);
     }
   }
+};
+
+const onAddToCart = () => {
+  emit("addToCart");
 };
 </script>
 
