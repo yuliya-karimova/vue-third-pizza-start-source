@@ -27,3 +27,4 @@ export * from './misc-order-misc.controller';
 export * from './pizza-ingredient.controller';
 export * from './address-order.controller';
 export * from './order-address.controller';
+export * from './favorite-pizza.controller';

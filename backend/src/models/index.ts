@@ -10,3 +10,4 @@ export * from './order.model';
 export * from './misc.model';
 export * from './misc-order.model';
 export * from './pizza-ingredient.model';
+export * from './favorite-pizza.model';

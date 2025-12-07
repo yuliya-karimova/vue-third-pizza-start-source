@@ -7,6 +7,7 @@ import CartView from "@/views/CartView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import UserView from "@/views/UserView.vue";
 import OrdersView from "@/views/OrdersView.vue";
+import FavoritesView from "@/views/FavoritesView.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
@@ -42,6 +43,12 @@ const router = createRouter({
           path: "orders",
           name: "orders",
           component: OrdersView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "favorites",
+          name: "favorites",
+          component: FavoritesView,
           meta: { requiresAuth: true },
         },
       ],

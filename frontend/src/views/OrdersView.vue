@@ -3,11 +3,22 @@
     <div class="layout__sidebar sidebar">
       <router-link to="/orders" :class="['layout__link', { 'layout__link--active': $route.path === '/orders' }]">История заказов</router-link>
       <router-link to="/profile" :class="['layout__link', { 'layout__link--active': $route.path === '/profile' }]">Мои данные</router-link>
+      <router-link to="/favorites" :class="['layout__link', { 'layout__link--active': $route.path === '/favorites' }]">Избранные пиццы</router-link>
     </div>
 
     <div class="layout__content">
       <div class="layout__title">
         <h1 class="title title--big">История заказов</h1>
+      </div>
+
+      <div class="layout__filter">
+        <div class="input">
+          <input
+            v-model="filterQuery"
+            type="text"
+            placeholder="Поиск по названию пиццы..."
+          />
+        </div>
       </div>
 
       <div v-if="error" class="layout__error">
@@ -22,12 +33,16 @@
         overlay
       />
 
+      <div v-if="!isLoading && filteredOrders.length === 0 && orders.length > 0" class="layout__empty">
+        Не найдено заказов с пиццей "{{ filterQuery }}"
+      </div>
+
       <div v-if="!isLoading && orders.length === 0" class="layout__empty">
         У вас пока нет заказов
       </div>
 
       <TransitionGroup name="fade-in-up" tag="div">
-        <section v-for="order in orders" :key="order.id" class="sheet order">
+        <section v-for="order in filteredOrders" :key="order.id" class="sheet order">
         <div class="order__wrapper">
           <div class="order__number">
             <b>Заказ #{{ order.id }}</b>
@@ -112,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { OrdersService, API_BASE_URL } from "@/services";
 import type { Order, OrderPizza, OrderMisc } from "@/services/orders.service";
@@ -137,6 +152,7 @@ const toast = useToast();
 const orders = ref<Order[]>([]);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+const filterQuery = ref<string>("");
 
 onMounted(async () => {
   if (authStore.isAuthenticated) {
@@ -159,6 +175,24 @@ const loadOrders = async () => {
     isLoading.value = false;
   }
 };
+
+const filteredOrders = computed(() => {
+  if (!filterQuery.value.trim()) {
+    return orders.value;
+  }
+
+  const query = filterQuery.value.toLowerCase().trim();
+  
+  return orders.value.filter((order: Order) => {
+    if (!order.orderPizzas || order.orderPizzas.length === 0) {
+      return false;
+    }
+
+    return order.orderPizzas.some((pizza: OrderPizza) => {
+      return pizza.name.toLowerCase().includes(query);
+    });
+  });
+});
 
 const getPizzaPrice = (pizza: OrderPizza): number => {
   let price = 0;
@@ -424,7 +458,13 @@ const deleteOrder = async (order: Order) => {
 @use "@/assets/scss/blocks/pizza";
 @use "@/assets/scss/blocks/order";
 @use "@/assets/scss/blocks/logo";
+@use "@/assets/scss/blocks/input";
 @use "@/assets/scss/layout/layout";
 @use "@/assets/scss/layout/sidebar";
+
+.layout__filter {
+  margin-bottom: 24px;
+  max-width: 400px;
+}
 </style>
 

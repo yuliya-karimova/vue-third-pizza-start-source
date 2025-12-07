@@ -3,6 +3,7 @@
     <div class="layout__sidebar sidebar">
       <router-link to="/orders" :class="['layout__link', { 'layout__link--active': $route.path === '/orders' }]">История заказов</router-link>
       <router-link to="/profile" :class="['layout__link', { 'layout__link--active': $route.path === '/profile' }]">Мои данные</router-link>
+      <router-link to="/favorites" :class="['layout__link', { 'layout__link--active': $route.path === '/favorites' }]">Избранные пиццы</router-link>
     </div>
 
     <div class="layout__content">

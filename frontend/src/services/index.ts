@@ -8,5 +8,6 @@ export { MiscService } from "./misc.service";
 export { AddressesService } from "./addresses.service";
 export { OrdersService } from "./orders.service";
 export { AuthService } from "./auth.service";
+export { FavoritePizzasService, type FavoritePizza, type FavoriteIngredient, type CreateFavoritePizzaDto } from "./favorite-pizzas.service";
 export { API_BASE_URL } from "./config";
 
