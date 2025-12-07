@@ -1,23 +1,20 @@
-<template>
-  <AppLayout />
-</template>
+@use "../ds-system/ds-colors";
+@use "../ds-system/ds-shadows";
+@use "../ds-system/ds-typography";
 
-<script setup lang="ts">
-import AppLayout from "@/layouts/AppLayout.vue";
-</script>
-
-<style lang="scss">
-@import "@/assets/scss/app.scss";
-
-body {
-  justify-content: center;
+.main {
+  display: flex;
   align-items: center;
+  justify-content: center;
+
+  height: 100vh;
 }
+
 .main__wrapper {
   padding-bottom: 30px;
 
-  background-color: $white;
-  box-shadow: $shadow-light;
+  background-color: ds-colors.$white;
+  box-shadow: ds-shadows.$shadow-light;
 
   h1 {
     margin-bottom: 0;
@@ -25,7 +22,7 @@ body {
 
     text-align: center;
 
-    @include b-s36-h42;
+    @include ds-typography.b-s36-h42;
   }
 
   p {
@@ -46,7 +43,7 @@ body {
   margin-bottom: 30px;
   padding: 20px 0;
 
-  background-color: $green-600;
+  background-color: ds-colors.$green-600;
 
   img {
     display: block;
@@ -54,4 +51,3 @@ body {
     margin: 0 auto;
   }
 }
-</style>
