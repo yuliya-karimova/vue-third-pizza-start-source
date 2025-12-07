@@ -51,6 +51,7 @@
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { logger } from "@/utils/logger";
 
 const router = useRouter();
 const route = useRoute();
@@ -109,7 +110,7 @@ const onSubmit = async () => {
     const redirect = route.query.redirect as string;
     router.push(redirect || "/");
   } catch (error) {
-    console.error("Ошибка авторизации:", error);
+    logger.error("Ошибка авторизации:", error);
   }
 };
 </script>

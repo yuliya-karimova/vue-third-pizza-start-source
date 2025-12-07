@@ -26,6 +26,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Size } from "@/types";
+import { logger } from "@/utils/logger";
 
 interface Props {
   modelValue: Size | null;
@@ -53,9 +54,8 @@ const selectedSizeId = computed({
     return props.modelValue?.id ?? 0;
   },
   set(id) {
-    console.log("🚀 ~ id:", id)
     const size = sizesMap.value[id];
-    console.log("🚀 ~ size:", size)
+    
     if (size) {
       emit("update:modelValue", size);
     }

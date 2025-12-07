@@ -119,6 +119,7 @@ import { getImageUrl } from "@/utils/images";
 import { useModal } from "@/composables/useModal";
 import { useToast } from "@/composables/useToast";
 import { ModalDialog } from "@/common/components/modal-dialog";
+import { logger } from "@/utils/logger";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -148,7 +149,7 @@ const loadOrders = async () => {
     orders.value.sort((a: Order, b: Order) => (b.id || 0) - (a.id || 0));
   } catch (err: any) {
     error.value = err.message || "Ошибка при загрузке заказов";
-    console.error("Ошибка загрузки заказов:", err);
+    logger.error("Ошибка загрузки заказов:", err);
   } finally {
     isLoading.value = false;
   }
@@ -317,7 +318,7 @@ const repeatOrder = (order: Order) => {
       const sauce = dataStore.getSauceById(pizza.sauceId);
 
       if (!dough || !size || !sauce) {
-        console.warn(`Не найдены данные для пиццы: dough=${pizza.doughId}, size=${pizza.sizeId}, sauce=${pizza.sauceId}`);
+        logger.warn(`Не найдены данные для пиццы: dough=${pizza.doughId}, size=${pizza.sizeId}, sauce=${pizza.sauceId}`);
         return;
       }
 
@@ -401,7 +402,7 @@ const deleteOrder = async (order: Order) => {
     }
     toast.success("Заказ успешно удален");
   } catch (error: any) {
-    console.error("Ошибка при удалении заказа:", error);
+    logger.error("Ошибка при удалении заказа:", error);
     const errorMessage = error.response?.data?.error?.message 
       || error.response?.data?.message
       || error.message

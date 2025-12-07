@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Dough, Size, Sauce, IngredientsCounter, Misc } from "@/types";
+import { logger } from "@/utils/logger";
 
 export interface CartPizza {
   id: string; // уникальный ID для пиццы в корзине
@@ -35,7 +36,7 @@ const loadCartFromStorage = (): CartState => {
       };
     }
   } catch (error) {
-    console.error("Ошибка при загрузке корзины из localStorage:", error);
+    logger.error("Ошибка при загрузке корзины из localStorage:", error);
   }
   return {
     pizzas: [],
@@ -47,7 +48,7 @@ const saveCartToStorage = (state: CartState) => {
   try {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state));
   } catch (error) {
-    console.error("Ошибка при сохранении корзины в localStorage:", error);
+    logger.error("Ошибка при сохранении корзины в localStorage:", error);
   }
 };
 

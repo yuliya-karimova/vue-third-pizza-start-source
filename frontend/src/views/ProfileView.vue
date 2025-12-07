@@ -146,6 +146,7 @@ import { useAuthStore } from "@/stores/auth";
 import { AddressesService, API_BASE_URL } from "@/services";
 import { getImageUrl } from "@/utils/images";
 import type { Address } from "@/stores/profile";
+import { logger } from "@/utils/logger";
 
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
@@ -182,7 +183,7 @@ const loadAddresses = async () => {
       addNewAddress();
     }
   } catch (error) {
-    console.error("Ошибка загрузки адресов:", error);
+    logger.error("Ошибка загрузки адресов:", error);
   }
 };
 
@@ -233,7 +234,7 @@ const saveAddress = async () => {
     }
     editingAddress.value = null;
   } catch (error) {
-    console.error("Ошибка сохранения адреса:", error);
+    logger.error("Ошибка сохранения адреса:", error);
   }
 };
 
@@ -249,7 +250,7 @@ const deleteAddress = async () => {
     profileStore.removeAddress(editingAddress.value.id);
     editingAddress.value = null;
   } catch (error) {
-    console.error("Ошибка удаления адреса:", error);
+    logger.error("Ошибка удаления адреса:", error);
   }
 };
 </script>

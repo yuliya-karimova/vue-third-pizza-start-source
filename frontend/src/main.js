@@ -4,6 +4,7 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
 import { useCartStore, CART_STORAGE_KEY } from "./stores/cart";
+import { logger } from "./utils/logger";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -20,7 +21,7 @@ cartStore.$subscribe((mutation, state) => {
       misc: state.misc,
     }));
   } catch (error) {
-    console.error("Ошибка при сохранении корзины в localStorage:", error);
+    logger.error("Ошибка при сохранении корзины в localStorage:", error);
   }
 });
 

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import type { Dough, Size, Sauce, IngredientsCounter } from "@/types";
 import { useDataStore } from "./data";
+import { logger } from "@/utils/logger";
 
 export interface PizzaState {
   selectedDough: Dough | null;
@@ -93,7 +94,7 @@ export const usePizzaStore = defineStore("pizza", {
     },
 
     setSize(size: Size) {
-      console.log("🚀 ~ size:", size)
+      logger.debug("Selected size:", size);
       this.selectedSize = size;
     },
 

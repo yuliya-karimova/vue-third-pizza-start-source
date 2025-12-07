@@ -281,6 +281,7 @@ import type { CartPizza } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
 import OrderSuccessPopup from "@/common/components/order-success-popup/OrderSuccessPopup.vue";
 import { useToast } from "@/composables/useToast";
+import { logger } from "@/utils/logger";
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -349,7 +350,7 @@ onMounted(async () => {
       const addresses = await addressesService.findAll();
       profileStore.addresses = addresses;
     } catch (error) {
-      console.error("Ошибка загрузки адресов:", error);
+      logger.error("Ошибка загрузки адресов:", error);
     }
   }
 });
@@ -506,7 +507,7 @@ const handleSubmit = async () => {
 
       // Отправляем заказ
       const createdOrder = await ordersService.create(orderData);
-      console.log("Заказ создан:", createdOrder);
+      logger.info("Заказ создан:", createdOrder);
 
       // Очищаем корзину
       cartStore.clearCart();
@@ -518,7 +519,7 @@ const handleSubmit = async () => {
       showSuccessPopup.value = true;
     }
   } catch (error: any) {
-    console.error("Ошибка при оформлении заказа:", error);
+    logger.error("Ошибка при оформлении заказа:", error);
     const errorMessage = error.response?.data?.error?.message 
       || error.response?.data?.message
       || error.message
