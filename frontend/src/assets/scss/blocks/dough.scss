@@ -39,7 +39,7 @@
   &--light {
     b {
       &::before {
-        background-image: url("../../img/dough-light.svg");
+        background-image: url("@/assets/img/dough-light.svg");
       }
     }
   }
@@ -47,7 +47,7 @@
   &--large {
     b {
       &::before {
-        background-image: url("../../img/dough-large.svg");
+        background-image: url("@/assets/img/dough-large.svg");
       }
     }
   }
