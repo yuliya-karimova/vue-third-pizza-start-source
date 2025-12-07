@@ -1,5 +1,7 @@
+@use "../ds-system/ds-colors";
+
 .sidebar {
   flex-grow: 1;
 
-  background-color: rgba($green-500, 0.05);
+  background-color: rgba(ds-colors.$green-500, 0.05);
 }

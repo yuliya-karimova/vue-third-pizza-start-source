@@ -54,5 +54,5 @@ const selectedSauceId = computed({
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/radio.scss";
+@use "@/assets/scss/blocks/radio";
 </style>

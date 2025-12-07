@@ -1,18 +1,22 @@
 // general
-@import "libs/normalize.scss";
-@import "fonts.scss";
-@import "ds-system/ds.scss";
-@import "visually-hidden.scss";
-@import "scaffolding.scss";
-@import "mixins/mixins";
+@use "libs/normalize";
+@use "fonts";
+@use "ds-system/ds" as *;
+@use "visually-hidden";
+@use "scaffolding";
+@use "mixins/mixins";
+
+// common components (used in templates: cart.html, orders.html, user-data.html, sign-in.html)
+@use "common";
+
 // layouts
-@import "layout/container.scss";
-@import "layout/content.scss";
-@import "layout/header.scss";
-@import "layout/layout-form.scss";
-@import "layout/layout.scss";
-@import "layout/main.scss";
-@import "layout/popup.scss";
-@import "layout/sheet.scss";
-@import "layout/sidebar.scss";
-@import "layout/sign-form.scss";
+@use "layout/container";
+@use "layout/content";
+@use "layout/header";
+@use "layout/layout-form";
+@use "layout/layout";
+@use "layout/main";
+@use "layout/popup";
+@use "layout/sheet";
+@use "layout/sidebar";
+@use "layout/sign-form";

@@ -1,0 +1,49 @@
+
+@use "ds-system/ds-colors";
+@use "ds-system/ds-shadows";
+@use "ds-system/ds-typography";
+
+// Основные блоки (используются в большинстве шаблонов)
+@use "blocks/title";
+@use "blocks/button";
+@use "blocks/input";
+@use "blocks/select";
+@use "blocks/product";
+@use "blocks/counter";
+
+// Блоки, используемые в конкретных шаблонах
+@use "blocks/cart-list";
+@use "blocks/address-form";
+
+
+// Правила, которые повторяются в разных компонентах
+.main__wrapper {
+  padding-bottom: 30px;
+
+  border-radius: 8px;
+  background-color: ds-colors.$white;
+  box-shadow: ds-shadows.$shadow-light;
+
+  h1 {
+    margin-bottom: 0;
+    padding: 0 95px;
+
+    text-align: center;
+
+    @include ds-typography.b-s36-h42;
+  }
+
+  p {
+    padding: 0 95px;
+
+    text-align: center;
+
+    font-size: 20px;
+    line-height: 30px;
+  }
+
+  b {
+    font-size: 1.2em;
+  }
+}
+

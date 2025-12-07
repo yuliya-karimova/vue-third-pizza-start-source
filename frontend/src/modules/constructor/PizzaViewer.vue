@@ -74,6 +74,6 @@ const onPizzaDrop = (event: DragEvent) => {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/button.scss";
-@import "@/assets/scss/blocks/pizza.scss";
+@use "@/assets/scss/blocks/button";
+@use "@/assets/scss/blocks/pizza";
 </style>

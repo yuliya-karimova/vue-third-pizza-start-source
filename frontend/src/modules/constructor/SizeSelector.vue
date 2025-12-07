@@ -60,5 +60,5 @@ const selectedSizeId = computed({
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/blocks/diameter.scss";
+@use "@/assets/scss/blocks/diameter";
 </style>
