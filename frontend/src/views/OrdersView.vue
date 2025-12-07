@@ -92,6 +92,18 @@
       </section>
       </TransitionGroup>
     </div>
+    
+    <ModalDialog
+      v-model="modal.isVisible"
+      :title="modal.modalOptions.title"
+      :message="modal.modalOptions.message"
+      :confirm-text="modal.modalOptions.confirmText"
+      :cancel-text="modal.modalOptions.cancelText"
+      :show-cancel-button="modal.modalOptions.showCancelButton"
+      :is-danger="modal.modalOptions.isDanger"
+      @confirm="modal.confirm"
+      @cancel="modal.cancel"
+    />
   </main>
 </template>
 
@@ -104,12 +116,17 @@ import { useAuthStore } from "@/stores/auth";
 import { useDataStore } from "@/stores/data";
 import { useCartStore } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
+import { useModal } from "@/composables/useModal";
+import { useToast } from "@/composables/useToast";
+import { ModalDialog } from "@/common/components/modal-dialog";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const dataStore = useDataStore();
 const cartStore = useCartStore();
 const ordersService = new OrdersService(API_BASE_URL);
+const modal = useModal();
+const toast = useToast();
 
 const orders = ref<Order[]>([]);
 const isLoading = ref(false);
@@ -288,7 +305,7 @@ const formatAddress = (order: Order): string => {
 
 const repeatOrder = (order: Order) => {
   if (!order.orderPizzas && (!order.orderMisc || order.orderMisc.length === 0)) {
-    alert("Заказ пустой, нечего повторять");
+    toast.warning("Заказ пустой, нечего повторять");
     return;
   }
 
@@ -363,7 +380,15 @@ const deleteOrder = async (order: Order) => {
     return;
   }
 
-  if (!confirm(`Вы уверены, что хотите удалить заказ #${order.id}?`)) {
+  const confirmed = await modal.show({
+    title: "Удаление заказа",
+    message: `Вы уверены, что хотите удалить заказ #${order.id}?`,
+    confirmText: "Удалить",
+    cancelText: "Отмена",
+    isDanger: true,
+  });
+
+  if (!confirmed) {
     return;
   }
 
@@ -374,13 +399,14 @@ const deleteOrder = async (order: Order) => {
     if (index !== -1) {
       orders.value.splice(index, 1);
     }
+    toast.success("Заказ успешно удален");
   } catch (error: any) {
     console.error("Ошибка при удалении заказа:", error);
     const errorMessage = error.response?.data?.error?.message 
       || error.response?.data?.message
       || error.message
       || "Произошла ошибка при удалении заказа";
-    alert(errorMessage);
+    toast.error(errorMessage);
   }
 };
 </script>

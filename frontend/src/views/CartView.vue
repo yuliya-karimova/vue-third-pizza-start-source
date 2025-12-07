@@ -280,6 +280,7 @@ import { AddressesService, OrdersService, API_BASE_URL } from "@/services";
 import type { CartPizza } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
 import OrderSuccessPopup from "@/common/components/order-success-popup/OrderSuccessPopup.vue";
+import { useToast } from "@/composables/useToast";
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -289,6 +290,7 @@ const authStore = useAuthStore();
 const pizzaStore = usePizzaStore();
 const addressesService = new AddressesService(API_BASE_URL);
 const ordersService = new OrdersService(API_BASE_URL);
+const toast = useToast();
 
 const deliveryType = ref<string>("pickup");
 const phone = ref<string>("");
@@ -429,7 +431,7 @@ const handleSubmit = async () => {
 
   // Валидация телефона
   if (!phone.value || !phone.value.trim()) {
-    alert("Пожалуйста, укажите контактный телефон");
+    toast.warning("Пожалуйста, укажите контактный телефон");
     return;
   }
 
@@ -437,7 +439,7 @@ const handleSubmit = async () => {
   let addressData = null;
   if (deliveryType.value === "new") {
     if (!newAddress.value.name?.trim() || !newAddress.value.street?.trim() || !newAddress.value.building?.trim()) {
-      alert("Пожалуйста, заполните все обязательные поля адреса");
+      toast.warning("Пожалуйста, заполните все обязательные поля адреса");
       return;
     }
     addressData = {
@@ -463,7 +465,7 @@ const handleSubmit = async () => {
 
   // Если не самовывоз и адрес не указан
   if (deliveryType.value !== "pickup" && !addressData) {
-    alert("Пожалуйста, выберите или введите адрес доставки");
+    toast.warning("Пожалуйста, выберите или введите адрес доставки");
     return;
   }
 
@@ -521,7 +523,7 @@ const handleSubmit = async () => {
       || error.response?.data?.message
       || error.message
       || "Произошла ошибка при оформлении заказа. Попробуйте еще раз.";
-    alert(errorMessage);
+    toast.error(errorMessage);
   } finally {
     isSubmitting.value = false;
   }
