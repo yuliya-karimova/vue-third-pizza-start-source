@@ -46,18 +46,17 @@
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
+  gap: 50px;
 
-  margin-top: 24px;
-  padding-right: 10px;
-  padding-left: 10px;
+  padding: 24px;
 }
 
 .order__item {
   display: flex;
+  gap: 15px;
+  justify-content: space-between;
 
-  width: 310px;
-  margin-right: 33px;
-  margin-bottom: 32px;
+  width: 320px;
 }
 
 .order__price {
@@ -75,8 +74,7 @@
   align-items: flex-start;
   flex-wrap: wrap;
 
-  margin-bottom: 5px;
-  padding-left: 80px;
+  margin: 12px 24px;
 
   li {
     @include ds-typography.b-s11-h16;

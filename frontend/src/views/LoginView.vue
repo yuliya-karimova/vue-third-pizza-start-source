@@ -85,11 +85,6 @@ const validatePassword = () => {
     return false;
   }
 
-  if (password.value.length < 6) {
-    errors.value.password = "Пароль должен содержать минимум 6 символов";
-    return false;
-  }
-
   return true;
 };
 

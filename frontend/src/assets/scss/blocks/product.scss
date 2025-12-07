@@ -4,11 +4,36 @@
 .product {
   display: flex;
   align-items: center;
+  gap: 15px;
+}
+
+.product__img {
+  flex-shrink: 0;
+  
+  &--pizza {
+    width: 56px;
+    height: 56px;
+    position: relative;
+    
+    .pizza {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      
+      .pizza__wrapper {
+        width: 100%;
+        height: 100%;
+      }
+      
+      .pizza__filling {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
 }
 
 .product__text {
-  margin-left: 15px;
-
   h2 {
     @include ds-typography.b-s18-h21;
 
@@ -19,6 +44,11 @@
   ul {
     @include m_clear-list.clear-list;
     @include ds-typography.l-s11-h13;
+  }
+  
+  &--empty {
+    color: rgba(0, 0, 0, 0.5);
+    font-style: italic;
   }
 }
 

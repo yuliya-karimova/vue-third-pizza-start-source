@@ -22,11 +22,39 @@ export interface CartState {
   misc: CartMisc[];
 }
 
-export const useCartStore = defineStore("cart", {
-  state: (): CartState => ({
+export const CART_STORAGE_KEY = "cart";
+
+const loadCartFromStorage = (): CartState => {
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        pizzas: parsed.pizzas || [],
+        misc: parsed.misc || [],
+      };
+    }
+  } catch (error) {
+    console.error("Ошибка при загрузке корзины из localStorage:", error);
+  }
+  return {
     pizzas: [],
     misc: [],
-  }),
+  };
+};
+
+const saveCartToStorage = (state: CartState) => {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error("Ошибка при сохранении корзины в localStorage:", error);
+  }
+};
+
+export const useCartStore = defineStore("cart", {
+  state: (): CartState => {
+    return loadCartFromStorage();
+  },
 
   getters: {
     totalPizzasPrice: (state) => {
