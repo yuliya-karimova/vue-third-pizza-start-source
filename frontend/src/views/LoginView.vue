@@ -6,7 +6,7 @@
     <div class="sign-form__title">
       <h1 class="title title--small">Авторизуйтесь на сайте</h1>
     </div>
-    <form @submit.prevent="onSubmit" action="test.html" method="post">
+    <form action="test.html" method="post" @submit.prevent="onSubmit">
       <div v-if="authStore.error" class="sign-form__error">
         {{ authStore.error }}
       </div>
@@ -22,7 +22,9 @@
             :class="{ 'input--error': errors.email }"
             @blur="validateEmail"
           />
-          <span v-if="errors.email" class="input__error">{{ errors.email }}</span>
+          <span v-if="errors.email" class="input__error">{{
+            errors.email
+          }}</span>
         </label>
       </div>
 
@@ -37,10 +39,16 @@
             :class="{ 'input--error': errors.password }"
             @blur="validatePassword"
           />
-          <span v-if="errors.password" class="input__error">{{ errors.password }}</span>
+          <span v-if="errors.password" class="input__error">{{
+            errors.password
+          }}</span>
         </label>
       </div>
-      <button type="submit" class="button button--loading" :disabled="authStore.isLoading || !isFormValid">
+      <button
+        type="submit"
+        class="button button--loading"
+        :disabled="authStore.isLoading || !isFormValid"
+      >
         <template v-if="authStore.isLoading">
           <LoadingSpinner size="small" :message="''" />
           <span class="button__text">Вход...</span>
@@ -68,7 +76,7 @@ const errors = ref<{ email?: string; password?: string }>({});
 
 const validateEmail = () => {
   errors.value.email = undefined;
-  
+
   if (!email.value) {
     errors.value.email = "E-mail обязателен";
     return false;
@@ -85,7 +93,7 @@ const validateEmail = () => {
 
 const validatePassword = () => {
   errors.value.password = undefined;
-  
+
   if (!password.value) {
     errors.value.password = "Пароль обязателен";
     return false;
@@ -95,7 +103,12 @@ const validatePassword = () => {
 };
 
 const isFormValid = computed(() => {
-  return email.value && password.value && !errors.value.email && !errors.value.password;
+  return (
+    email.value &&
+    password.value &&
+    !errors.value.email &&
+    !errors.value.password
+  );
 });
 
 const onSubmit = async () => {
@@ -152,10 +165,10 @@ const onSubmit = async () => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  
+
   .loading-spinner {
     padding: 0;
-    
+
     &__spinner {
       width: 16px;
       height: 16px;
@@ -167,4 +180,3 @@ const onSubmit = async () => {
   margin-left: 0;
 }
 </style>
-

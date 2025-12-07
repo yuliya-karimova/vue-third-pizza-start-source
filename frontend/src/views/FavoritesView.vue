@@ -1,9 +1,30 @@
 <template>
   <main class="layout">
     <div class="layout__sidebar sidebar">
-      <router-link to="/orders" :class="['layout__link', { 'layout__link--active': $route.path === '/orders' }]">История заказов</router-link>
-      <router-link to="/profile" :class="['layout__link', { 'layout__link--active': $route.path === '/profile' }]">Мои данные</router-link>
-      <router-link to="/favorites" :class="['layout__link', { 'layout__link--active': $route.path === '/favorites' }]">Избранные пиццы</router-link>
+      <router-link
+        to="/orders"
+        :class="[
+          'layout__link',
+          { 'layout__link--active': $route.path === '/orders' },
+        ]"
+        >История заказов</router-link
+      >
+      <router-link
+        to="/profile"
+        :class="[
+          'layout__link',
+          { 'layout__link--active': $route.path === '/profile' },
+        ]"
+        >Мои данные</router-link
+      >
+      <router-link
+        to="/favorites"
+        :class="[
+          'layout__link',
+          { 'layout__link--active': $route.path === '/favorites' },
+        ]"
+        >Избранные пиццы</router-link
+      >
     </div>
 
     <div class="layout__content">
@@ -11,21 +32,33 @@
         <h1 class="title title--big">Избранные пиццы</h1>
       </div>
 
-      <LoadingSpinner 
-        v-if="favoritesStore.isLoading" 
+      <LoadingSpinner
+        v-if="favoritesStore.isLoading"
         :visible="favoritesStore.isLoading"
         size="large"
         message="Загрузка избранных..."
         overlay
       />
 
-      <div v-if="!favoritesStore.isLoading && favoritesStore.favoritePizzas.length === 0" class="layout__empty">
+      <div
+        v-if="
+          !favoritesStore.isLoading &&
+          favoritesStore.favoritePizzas.length === 0
+        "
+        class="layout__empty"
+      >
         У вас пока нет избранных пицц
-        <p class="layout__empty-hint">Создайте пиццу в конструкторе и сохраните её в избранное</p>
+        <p class="layout__empty-hint">
+          Создайте пиццу в конструкторе и сохраните её в избранное
+        </p>
       </div>
 
       <TransitionGroup v-else name="fade-in-up" tag="div">
-        <section v-for="favorite in favoritesStore.favoritePizzas" :key="favorite.id" class="sheet favorite-pizza">
+        <section
+          v-for="favorite in favoritesStore.favoritePizzas"
+          :key="favorite.id"
+          class="sheet favorite-pizza"
+        >
           <div class="favorite-pizza__header">
             <div class="favorite-pizza__info">
               <h2 class="favorite-pizza__name">{{ favorite.name }}</h2>
@@ -53,16 +86,20 @@
 
           <div class="favorite-pizza__content">
             <div class="favorite-pizza__preview">
-              <div :class="`pizza pizza--foundation--${getPizzaSizeKey(favorite)}-${getPizzaSauceKey(favorite)}`">
+              <div
+                :class="`pizza pizza--foundation--${getPizzaSizeKey(favorite)}-${getPizzaSauceKey(favorite)}`"
+              >
                 <div class="pizza__wrapper">
                   <div
-                    v-for="(ingredient, index) in getPizzaIngredientsKeys(favorite)"
+                    v-for="(ingredient, index) in getPizzaIngredientsKeys(
+                      favorite,
+                    )"
                     :key="`${ingredient.key}-${index}`"
                     :class="[
                       'pizza__filling',
                       `pizza__filling--${ingredient.key}`,
                       ingredient.count === 2 ? 'pizza__filling--second' : '',
-                      ingredient.count === 3 ? 'pizza__filling--third' : ''
+                      ingredient.count === 3 ? 'pizza__filling--third' : '',
                     ]"
                   />
                 </div>
@@ -102,7 +139,6 @@ import { usePizzaStore } from "@/stores/pizza";
 import { useDataStore } from "@/stores/data";
 import { useToast } from "@/composables/useToast";
 import { useModal } from "@/composables/useModal";
-import { ModalDialog } from "@/common/components/modal-dialog";
 import { LoadingSpinner } from "@/common/components/loading-spinner";
 import type { FavoritePizza } from "@/services";
 
@@ -134,7 +170,9 @@ const getPizzaSauceKey = (favorite: FavoritePizza): string => {
   return favorite.sauce?.key || "";
 };
 
-const getPizzaIngredientsKeys = (favorite: FavoritePizza): Array<{ key: string; count: number }> => {
+const getPizzaIngredientsKeys = (
+  favorite: FavoritePizza,
+): Array<{ key: string; count: number }> => {
   const ingredients: Array<{ key: string; count: number }> = [];
   if (favorite.ingredients && favorite.ingredients.length > 0) {
     favorite.ingredients.forEach((ing) => {
@@ -152,14 +190,16 @@ const getIngredientsList = (favorite: FavoritePizza): string => {
   if (!favorite.ingredients || favorite.ingredients.length === 0) {
     return "Нет ингредиентов";
   }
-  
-  const names = favorite.ingredients.map((ing) => {
-    const ingredient = dataStore.getIngredientById(ing.ingredientId);
-    if (!ingredient) return "";
-    const name = ingredient.name.toLowerCase();
-    return ing.quantity > 1 ? `${name} ×${ing.quantity}` : name;
-  }).filter(Boolean);
-  
+
+  const names = favorite.ingredients
+    .map((ing) => {
+      const ingredient = dataStore.getIngredientById(ing.ingredientId);
+      if (!ingredient) return "";
+      const name = ingredient.name.toLowerCase();
+      return ing.quantity > 1 ? `${name} ×${ing.quantity}` : name;
+    })
+    .filter(Boolean);
+
   return names.join(", ") || "Нет ингредиентов";
 };
 
@@ -169,19 +209,19 @@ const loadToConstructor = (favorite: FavoritePizza) => {
     const size = dataStore.getSizeById(favorite.sizeId);
     if (size) pizzaStore.setSize(size);
   }
-  
+
   if (favorite.dough) {
     const dough = dataStore.getDoughById(favorite.doughId);
     if (dough) pizzaStore.setDough(dough);
   }
-  
+
   if (favorite.sauce) {
     const sauce = dataStore.getSauceById(favorite.sauceId);
     if (sauce) pizzaStore.setSauce(sauce);
   }
-  
+
   pizzaStore.setPizzaName(favorite.name);
-  
+
   // Загружаем ингредиенты
   if (favorite.ingredients && favorite.ingredients.length > 0) {
     const ingredients: Record<number, { count: number; price: number }> = {};
@@ -196,7 +236,7 @@ const loadToConstructor = (favorite: FavoritePizza) => {
     });
     pizzaStore.selectedIngredients = ingredients;
   }
-  
+
   // Переходим на главную страницу
   router.push("/");
 };
@@ -218,10 +258,11 @@ const deleteFavorite = async (id: number) => {
     await favoritesStore.removeFavorite(id);
     toast.success("Пицца удалена из избранного");
   } catch (error: any) {
-    const errorMessage = error.response?.data?.error?.message 
-      || error.response?.data?.message
-      || error.message
-      || "Ошибка при удалении из избранного";
+    const errorMessage =
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      error.message ||
+      "Ошибка при удалении из избранного";
     toast.error(errorMessage);
   }
 };
@@ -324,4 +365,3 @@ const deleteFavorite = async (id: number) => {
   }
 }
 </style>
-

@@ -16,10 +16,13 @@ app.use(router);
 const cartStore = useCartStore();
 cartStore.$subscribe((mutation, state) => {
   try {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({
-      pizzas: state.pizzas,
-      misc: state.misc,
-    }));
+    localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify({
+        pizzas: state.pizzas,
+        misc: state.misc,
+      }),
+    );
   } catch (error) {
     logger.error("Ошибка при сохранении корзины в localStorage:", error);
   }

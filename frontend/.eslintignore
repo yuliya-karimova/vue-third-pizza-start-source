@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+dist/
+build/
+
+# Build outputs
+*.min.js
+*.bundle.js
+
+# Config files
+vite.config.js
+vitest.config.*
+.eslintrc.cjs
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+

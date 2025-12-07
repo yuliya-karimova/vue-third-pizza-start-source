@@ -12,8 +12,8 @@
         <button
           type="button"
           class="toast__close"
-          @click="removeToast(toast.id)"
           aria-label="Закрыть уведомление"
+          @click="removeToast(toast.id)"
         >
           <span class="visually-hidden">Закрыть</span>
         </button>
@@ -35,18 +35,22 @@ export interface Toast {
 const toasts = ref<Toast[]>([]);
 let toastIdCounter = 0;
 
-const addToast = (message: string, type: Toast["type"] = "info", duration: number = 4000) => {
+const addToast = (
+  message: string,
+  type: Toast["type"] = "info",
+  duration: number = 4000,
+) => {
   const id = toastIdCounter++;
   const toast: Toast = { id, message, type, duration };
-  
+
   toasts.value.push(toast);
-  
+
   if (duration > 0) {
     setTimeout(() => {
       removeToast(id);
     }, duration);
   }
-  
+
   return id;
 };
 
@@ -71,10 +75,14 @@ defineExpose({
 // Делаем методы доступными глобально через window для удобства
 onMounted(() => {
   (window as any).__toast = {
-    success: (message: string, duration?: number) => addToast(message, "success", duration),
-    error: (message: string, duration?: number) => addToast(message, "error", duration),
-    warning: (message: string, duration?: number) => addToast(message, "warning", duration),
-    info: (message: string, duration?: number) => addToast(message, "info", duration),
+    success: (message: string, duration?: number) =>
+      addToast(message, "success", duration),
+    error: (message: string, duration?: number) =>
+      addToast(message, "error", duration),
+    warning: (message: string, duration?: number) =>
+      addToast(message, "warning", duration),
+    info: (message: string, duration?: number) =>
+      addToast(message, "info", duration),
   };
 });
 </script>
@@ -240,4 +248,3 @@ onMounted(() => {
   }
 }
 </style>
-

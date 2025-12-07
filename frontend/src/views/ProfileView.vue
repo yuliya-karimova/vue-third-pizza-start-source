@@ -1,37 +1,72 @@
 <template>
   <main class="layout">
     <div class="layout__sidebar sidebar">
-      <router-link to="/orders" :class="['layout__link', { 'layout__link--active': $route.path === '/orders' }]">История заказов</router-link>
-      <router-link to="/profile" :class="['layout__link', { 'layout__link--active': $route.path === '/profile' }]">Мои данные</router-link>
-      <router-link to="/favorites" :class="['layout__link', { 'layout__link--active': $route.path === '/favorites' }]">Избранные пиццы</router-link>
+      <router-link
+        to="/orders"
+        :class="[
+          'layout__link',
+          { 'layout__link--active': $route.path === '/orders' },
+        ]"
+        >История заказов</router-link
+      >
+      <router-link
+        to="/profile"
+        :class="[
+          'layout__link',
+          { 'layout__link--active': $route.path === '/profile' },
+        ]"
+        >Мои данные</router-link
+      >
+      <router-link
+        to="/favorites"
+        :class="[
+          'layout__link',
+          { 'layout__link--active': $route.path === '/favorites' },
+        ]"
+        >Избранные пиццы</router-link
+      >
     </div>
 
     <div class="layout__content">
       <div class="layout__title">
         <h1 class="title title--big">Мои данные</h1>
         <div class="layout__tabs">
-          <button type="button" class="layout__tab layout__tab--active">Мои данные</button>
+          <button type="button" class="layout__tab layout__tab--active">
+            Мои данные
+          </button>
         </div>
       </div>
 
       <div class="user">
         <picture v-if="profileStore.avatar">
-          <img :src="getImageUrl(profileStore.avatar)" :alt="profileStore.name" width="72" height="72" />
+          <img
+            :src="getImageUrl(profileStore.avatar)"
+            :alt="profileStore.name"
+            width="72"
+            height="72"
+          />
         </picture>
         <div class="user__name">
           <span>{{ profileStore.name || "Пользователь" }}</span>
         </div>
-        <p class="user__phone">Контактный телефон: <span>{{ profileStore.phone || "Не указан" }}</span></p>
+        <p class="user__phone">
+          Контактный телефон:
+          <span>{{ profileStore.phone || "Не указан" }}</span>
+        </p>
       </div>
 
-      <LoadingSpinner 
-        v-if="isLoadingAddresses" 
+      <LoadingSpinner
+        v-if="isLoadingAddresses"
         :visible="isLoadingAddresses"
         size="medium"
         message="Загрузка адресов..."
       />
 
-      <div v-for="address in profileStore.addresses" :key="address.id" class="layout__address">
+      <div
+        v-for="address in profileStore.addresses"
+        :key="address.id"
+        class="layout__address"
+      >
         <div class="sheet address-form">
           <div class="address-form__header">
             <b>{{ address.name }}</b>
@@ -45,15 +80,23 @@
               </button>
             </div>
           </div>
-          <p>{{ address.street }}, д. {{ address.building }}{{ address.flat ? `, кв. ${address.flat}` : "" }}</p>
+          <p>
+            {{ address.street }}, д. {{ address.building
+            }}{{ address.flat ? `, кв. ${address.flat}` : "" }}
+          </p>
           <small v-if="address.comment">{{ address.comment }}</small>
         </div>
       </div>
 
       <div v-if="editingAddress" class="layout__address">
-        <form @submit.prevent="saveAddress" class="address-form address-form--opened sheet">
+        <form
+          class="address-form address-form--opened sheet"
+          @submit.prevent="saveAddress"
+        >
           <div class="address-form__header">
-            <b>{{ editingAddress.id ? "Редактирование адреса" : "Новый адрес" }}</b>
+            <b>{{
+              editingAddress.id ? "Редактирование адреса" : "Новый адрес"
+            }}</b>
           </div>
 
           <div class="address-form__wrapper">
@@ -138,8 +181,15 @@
         </form>
       </div>
 
-      <div v-if="!editingAddress && profileStore.addresses.length > 0" class="layout__button">
-        <button type="button" class="button button--border" @click="addNewAddress">
+      <div
+        v-if="!editingAddress && profileStore.addresses.length > 0"
+        class="layout__button"
+      >
+        <button
+          type="button"
+          class="button button--border"
+          @click="addNewAddress"
+        >
           Добавить новый адрес
         </button>
       </div>
@@ -279,4 +329,3 @@ const deleteAddress = async () => {
 @use "@/assets/scss/layout/layout";
 @use "@/assets/scss/layout/sidebar";
 </style>
-

@@ -1,7 +1,7 @@
 <template>
   <main class="content">
-    <LoadingSpinner 
-      v-if="dataStore.isLoading" 
+    <LoadingSpinner
+      v-if="dataStore.isLoading"
       :visible="dataStore.isLoading"
       size="large"
       message="Загрузка данных..."
@@ -78,10 +78,15 @@ onMounted(() => {
 watch(
   () => dataStore.isDataLoaded,
   (isLoaded) => {
-    if (isLoaded && !pizzaStore.selectedDough && !pizzaStore.selectedSize && !pizzaStore.selectedSauce) {
+    if (
+      isLoaded &&
+      !pizzaStore.selectedDough &&
+      !pizzaStore.selectedSize &&
+      !pizzaStore.selectedSauce
+    ) {
       pizzaStore.initDefaultValues();
     }
-  }
+  },
 );
 
 // Формируем массив объектов ингредиентов для отображения с правильными классами
@@ -108,7 +113,9 @@ const currentSauceKey = computed(() => {
   return pizzaStore.selectedSauce.key || "";
 });
 
-const updateIngredients = (ingredients: Record<number, { count: number; price: number }>) => {
+const updateIngredients = (
+  ingredients: Record<number, { count: number; price: number }>,
+) => {
   for (const id in ingredients) {
     const { count, price } = ingredients[id];
     pizzaStore.setIngredientCount(Number(id), count, price);
@@ -126,7 +133,7 @@ const onAddIngredient = (ingredientId: number) => {
   if (currentCount >= 3) {
     return; // Блокируем добавление если достигнут максимум
   }
-  
+
   const ingredient = dataStore.getIngredientById(ingredientId);
   if (ingredient) {
     pizzaStore.addIngredient(ingredientId, ingredient.price);
@@ -134,7 +141,11 @@ const onAddIngredient = (ingredientId: number) => {
 };
 
 const onAddToCart = () => {
-  if (!pizzaStore.selectedDough || !pizzaStore.selectedSize || !pizzaStore.selectedSauce) {
+  if (
+    !pizzaStore.selectedDough ||
+    !pizzaStore.selectedSize ||
+    !pizzaStore.selectedSauce
+  ) {
     return;
   }
 

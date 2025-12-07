@@ -23,7 +23,7 @@
                 'pizza__filling',
                 `pizza__filling--${ingredient.key}`,
                 ingredient.count === 2 ? 'pizza__filling--second' : '',
-                ingredient.count === 3 ? 'pizza__filling--third' : ''
+                ingredient.count === 3 ? 'pizza__filling--third' : '',
               ]"
             />
           </TransitionGroup>
@@ -139,10 +139,13 @@ const onAddToCart = () => {
   if (addToCartButton.value) {
     // Запускаем анимацию полета к корзине
     // Vite обработает импорт SVG как URL-строку
-    const imageUrl = typeof productImage === "string" 
-      ? productImage 
-      : (productImage as any)?.default || (productImage as any)?.src || productImage;
-    
+    const imageUrl =
+      typeof productImage === "string"
+        ? productImage
+        : (productImage as any)?.default ||
+          (productImage as any)?.src ||
+          productImage;
+
     flyToCart(addToCartButton.value, ".header__cart a", {
       duration: 800,
       imageUrl: String(imageUrl),
@@ -158,7 +161,12 @@ const onAddToCart = () => {
 };
 
 const onSaveToFavorites = async () => {
-  if (!props.isReady || !props.selectedDough || !props.selectedSize || !props.selectedSauce) {
+  if (
+    !props.isReady ||
+    !props.selectedDough ||
+    !props.selectedSize ||
+    !props.selectedSauce
+  ) {
     return;
   }
 
@@ -171,10 +179,12 @@ const onSaveToFavorites = async () => {
 
   try {
     // Формируем массив ингредиентов для сохранения
-    const ingredients = Object.entries(props.selectedIngredients || {}).map(([ingredientId, item]) => ({
-      ingredientId: Number(ingredientId),
-      quantity: item.count,
-    }));
+    const ingredients = Object.entries(props.selectedIngredients || {}).map(
+      ([ingredientId, item]) => ({
+        ingredientId: Number(ingredientId),
+        quantity: item.count,
+      }),
+    );
 
     await favoritesStore.addFavorite({
       name: props.modelValue.trim(),
@@ -187,10 +197,11 @@ const onSaveToFavorites = async () => {
     toast.success("Пицца сохранена в избранное!");
     emit("savedToFavorites");
   } catch (error: any) {
-    const errorMessage = error.response?.data?.error?.message 
-      || error.response?.data?.message
-      || error.message
-      || "Ошибка при сохранении в избранное";
+    const errorMessage =
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      error.message ||
+      "Ошибка при сохранении в избранное";
     toast.error(errorMessage);
   } finally {
     isSaving.value = false;

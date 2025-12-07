@@ -5,25 +5,25 @@
         <button
           type="button"
           class="close"
-          @click="handleCancel"
           aria-label="Закрыть диалог"
+          @click="handleCancel"
         >
           <span class="visually-hidden">Закрыть</span>
         </button>
-        
+
         <div class="popup__title">
           <h2 class="title">{{ title }}</h2>
         </div>
-        
+
         <p v-if="message">{{ message }}</p>
-        
+
         <div class="popup__buttons">
           <button
             v-if="showCancelButton"
             type="button"
             class="button button--border"
-            @click="handleCancel"
             :disabled="isLoading"
+            @click="handleCancel"
           >
             {{ cancelText }}
           </button>
@@ -31,8 +31,8 @@
             type="button"
             class="button"
             :class="{ 'button--danger': isDanger }"
-            @click="handleConfirm"
             :disabled="isLoading"
+            @click="handleConfirm"
           >
             {{ isLoading ? loadingText : confirmText }}
           </button>
@@ -138,14 +138,13 @@ onUnmounted(() => {
 
 .button--danger {
   background-color: #dc3545;
-  
+
   &:hover:not(:disabled) {
     background-color: #c82333;
   }
-  
+
   &:active:not(:disabled) {
     background-color: #bd2130;
   }
 }
 </style>
-

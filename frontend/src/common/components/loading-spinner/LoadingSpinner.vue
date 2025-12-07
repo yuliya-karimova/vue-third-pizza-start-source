@@ -1,8 +1,15 @@
 <template>
-  <div v-if="visible" :class="['loading-spinner', `loading-spinner--${size}`, { 'loading-spinner--overlay': overlay }]">
+  <div
+    v-if="visible"
+    :class="[
+      'loading-spinner',
+      `loading-spinner--${size}`,
+      { 'loading-spinner--overlay': overlay },
+    ]"
+  >
     <div class="loading-spinner__content">
       <div class="loading-spinner__spinner">
-        <div class="spinner"></div>
+        <div class="spinner" />
       </div>
       <p v-if="message" class="loading-spinner__message">{{ message }}</p>
     </div>
@@ -12,15 +19,15 @@
 <script setup lang="ts">
 interface Props {
   visible?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   message?: string;
   overlay?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   visible: true,
-  size: 'medium',
-  message: '',
+  size: "medium",
+  message: "",
   overlay: false,
 });
 </script>
@@ -47,16 +54,16 @@ withDefaults(defineProps<Props>(), {
 
   &--small {
     padding: 10px;
-    
+
     .loading-spinner__spinner {
       width: 20px;
       height: 20px;
     }
-    
+
     .spinner {
       border-width: 2px;
     }
-    
+
     .loading-spinner__message {
       font-size: 12px;
       margin-top: 8px;
@@ -65,12 +72,12 @@ withDefaults(defineProps<Props>(), {
 
   &--medium {
     padding: 20px;
-    
+
     .loading-spinner__spinner {
       width: 40px;
       height: 40px;
     }
-    
+
     .loading-spinner__message {
       font-size: 14px;
       margin-top: 12px;
@@ -79,12 +86,12 @@ withDefaults(defineProps<Props>(), {
 
   &--large {
     padding: 40px;
-    
+
     .loading-spinner__spinner {
       width: 60px;
       height: 60px;
     }
-    
+
     .loading-spinner__message {
       font-size: 16px;
       margin-top: 16px;
@@ -162,7 +169,9 @@ withDefaults(defineProps<Props>(), {
 }
 
 @keyframes bounce {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0.6);
     opacity: 0.5;
   }
@@ -172,4 +181,3 @@ withDefaults(defineProps<Props>(), {
   }
 }
 </style>
-
