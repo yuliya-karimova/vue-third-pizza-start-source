@@ -16,7 +16,7 @@
             :value="size.id"
             class="visually-hidden"
           />
-          <span>{{ size.name }}</span>
+          <div>{{ size.name }}</div>
         </label>
       </div>
     </div>
@@ -53,9 +53,8 @@ const selectedSizeId = computed({
     return props.modelValue?.id ?? 0;
   },
   set(id) {
-    console.log("🚀 ~ id:", id)
     const size = sizesMap.value[id];
-    console.log("🚀 ~ size:", size)
+
     if (size) {
       emit("update:modelValue", size);
     }

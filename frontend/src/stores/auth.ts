@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { AuthService, type User, type LoginCredentials, type SignUpData } from "@/services/auth.service";
 import { useProfileStore } from "./profile";
+import { logger } from "@/utils/logger";
 
 export interface AuthState {
   user: User | null;
@@ -100,7 +101,7 @@ export const useAuthStore = defineStore("auth", {
         const authService = new AuthService();
         await authService.logout();
       } catch (error) {
-        console.error("Ошибка при выходе:", error);
+        logger.error("Ошибка при выходе:", error);
       } finally {
         this.user = null;
         this.isAuthenticated = false;

@@ -1,6 +1,13 @@
 <template>
   <main class="content">
-    <form action="#" method="post">
+    <LoadingSpinner
+      v-if="dataStore.isLoading"
+      :visible="dataStore.isLoading"
+      size="large"
+      message="Загрузка данных..."
+      overlay
+    />
+    <form v-else action="#" method="post">
       <div class="content__wrapper">
         <h1 class="title title--big">Конструктор пиццы</h1>
         <DoughSelector
@@ -33,6 +40,10 @@
           :ingredients-for-pizza="ingredientsForPizza"
           :price="pizzaStore.pizzaPrice"
           :is-ready="pizzaStore.isPizzaReady"
+          :selected-dough="pizzaStore.selectedDough"
+          :selected-size="pizzaStore.selectedSize"
+          :selected-sauce="pizzaStore.selectedSauce"
+          :selected-ingredients="pizzaStore.selectedIngredients"
           @update:model-value="pizzaStore.setPizzaName"
           @add-ingredient="onAddIngredient"
           @add-to-cart="onAddToCart"
@@ -52,6 +63,7 @@ import SizeSelector from "@/modules/constructor/SizeSelector.vue";
 import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
 import SaucesSelector from "@/modules/constructor/SaucesSelector.vue";
 import PizzaViewer from "@/modules/constructor/PizzaViewer.vue";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
 
 const pizzaStore = usePizzaStore();
 const dataStore = useDataStore();
@@ -66,10 +78,15 @@ onMounted(() => {
 watch(
   () => dataStore.isDataLoaded,
   (isLoaded) => {
-    if (isLoaded && !pizzaStore.selectedDough && !pizzaStore.selectedSize && !pizzaStore.selectedSauce) {
+    if (
+      isLoaded &&
+      !pizzaStore.selectedDough &&
+      !pizzaStore.selectedSize &&
+      !pizzaStore.selectedSauce
+    ) {
       pizzaStore.initDefaultValues();
     }
-  }
+  },
 );
 
 // Формируем массив объектов ингредиентов для отображения с правильными классами
@@ -96,7 +113,9 @@ const currentSauceKey = computed(() => {
   return pizzaStore.selectedSauce.key || "";
 });
 
-const updateIngredients = (ingredients: Record<number, { count: number; price: number }>) => {
+const updateIngredients = (
+  ingredients: Record<number, { count: number; price: number }>,
+) => {
   for (const id in ingredients) {
     const { count, price } = ingredients[id];
     pizzaStore.setIngredientCount(Number(id), count, price);
@@ -114,7 +133,7 @@ const onAddIngredient = (ingredientId: number) => {
   if (currentCount >= 3) {
     return; // Блокируем добавление если достигнут максимум
   }
-  
+
   const ingredient = dataStore.getIngredientById(ingredientId);
   if (ingredient) {
     pizzaStore.addIngredient(ingredientId, ingredient.price);
@@ -122,7 +141,11 @@ const onAddIngredient = (ingredientId: number) => {
 };
 
 const onAddToCart = () => {
-  if (!pizzaStore.selectedDough || !pizzaStore.selectedSize || !pizzaStore.selectedSauce) {
+  if (
+    !pizzaStore.selectedDough ||
+    !pizzaStore.selectedSize ||
+    !pizzaStore.selectedSauce
+  ) {
     return;
   }
 
@@ -138,7 +161,3 @@ const onAddToCart = () => {
   pizzaStore.resetPizza();
 };
 </script>
-
-<style lang="scss">
-@use "@/assets/scss/blocks/title";
-</style>

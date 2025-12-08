@@ -1,33 +1,46 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="layout-form">
+  <form class="layout-form" @submit.prevent="handleSubmit">
     <main class="content cart">
       <div class="container">
-        <div class="cart__title">
+        <div>
           <h1 class="title title--big">Корзина</h1>
         </div>
 
         <div v-if="cartStore.isEmpty" class="sheet cart__empty">
           <p>В корзине нет ни одного товара</p>
         </div>
-        
+
         <div v-else-if="!cartStore.pizzas.length" class="sheet cart__empty">
           <p>В корзине нет ни одной пиццы</p>
         </div>
 
-        <TransitionGroup v-else name="fade-in-up" tag="ul" class="cart-list sheet">
-          <li v-for="pizza in cartStore.pizzas" :key="pizza.id" class="cart-list__item">
+        <TransitionGroup
+          v-else
+          name="fade-in-up"
+          tag="ul"
+          class="cart-list sheet"
+        >
+          <li
+            v-for="pizza in cartStore.pizzas"
+            :key="pizza.id"
+            class="cart-list__item"
+          >
             <div class="product cart-list__product">
               <div class="product__img product__img--pizza">
-                <div :class="`pizza pizza--foundation--${getPizzaSizeKey(pizza)}-${getPizzaSauceKey(pizza)}`">
+                <div
+                  :class="`pizza pizza--foundation--${getPizzaSizeKey(pizza)}-${getPizzaSauceKey(pizza)}`"
+                >
                   <div class="pizza__wrapper">
                     <div
-                      v-for="(ingredient, index) in getPizzaIngredientsKeys(pizza)"
+                      v-for="(ingredient, index) in getPizzaIngredientsKeys(
+                        pizza,
+                      )"
                       :key="`${ingredient.key}-${index}`"
                       :class="[
                         'pizza__filling',
                         `pizza__filling--${ingredient.key}`,
                         ingredient.count === 2 ? 'pizza__filling--second' : '',
-                        ingredient.count === 3 ? 'pizza__filling--third' : ''
+                        ingredient.count === 3 ? 'pizza__filling--third' : '',
                       ]"
                     />
                   </div>
@@ -97,12 +110,21 @@
           </li>
         </TransitionGroup>
 
-        <div class="cart__additional">
+        <div>
           <h2 class="title title--small">Дополнительно</h2>
           <ul class="additional-list">
-            <li v-for="misc in dataStore.misc" :key="misc.id" class="additional-list__item sheet">
+            <li
+              v-for="misc in dataStore.misc"
+              :key="misc.id"
+              class="additional-list__item sheet"
+            >
               <p class="additional-list__description">
-                <img :src="getImageUrl(misc.image)" width="39" height="60" :alt="misc.name" />
+                <img
+                  :src="getImageUrl(misc.image)"
+                  width="39"
+                  height="60"
+                  :alt="misc.name"
+                />
                 <span>{{ misc.name }}</span>
               </p>
 
@@ -133,7 +155,14 @@
                 </div>
 
                 <div class="additional-list__price">
-                  <b>{{ (misc.price * getMiscQuantityInCart(misc.id)).toLocaleString("ru-RU") }} ₽</b>
+                  <b
+                    >{{
+                      (
+                        misc.price * getMiscQuantityInCart(misc.id)
+                      ).toLocaleString("ru-RU")
+                    }}
+                    ₽</b
+                  >
                 </div>
               </div>
             </li>
@@ -146,17 +175,41 @@
               <span>Получение заказа:</span>
 
               <select v-model="deliveryType" name="delivery" class="select">
-                <option value="pickup">Заберу сам</option>
+                <option value="pickup">Получу сам</option>
                 <option value="new">Новый адрес</option>
-                <option v-if="authStore.isAuthenticated" v-for="address in profileStore.addresses" :key="address.id" :value="`address-${address.id}`">
-                  {{ address.name }}
-                </option>
+                <template v-if="authStore.isAuthenticated">
+                  <option
+                    v-for="address in profileStore.addresses"
+                    :key="address.id"
+                    :value="`address-${address.id}`"
+                  >
+                    {{ address.name }}
+                  </option>
+                </template>
               </select>
             </label>
 
             <label class="input input--big-label">
               <span>Контактный телефон:</span>
-              <input v-model="phone" type="text" name="tel" placeholder="+7 999-999-99-99" />
+              <div>
+                <input
+                  :value="phoneInput.phone.value"
+                  type="text"
+                  name="tel"
+                  placeholder="+7 999 777-77-77"
+                  :class="{
+                    'input--error': phoneInput.error && phoneInput.touched,
+                  }"
+                  @input="phoneInput.handleInput"
+                  @blur="phoneInput.handleBlur"
+                />
+                <div
+                  v-if="phoneInput.error && phoneInput.touched"
+                  class="input__error"
+                >
+                  {{ phoneInput.error }}
+                </div>
+              </div>
             </label>
 
             <Transition name="slide-down">
@@ -167,28 +220,51 @@
                   <div class="cart-form__input">
                     <label class="input">
                       <span>Название адреса*</span>
-                      <input v-model="newAddress.name" type="text" name="addr-name" placeholder="Введите название адреса" required />
+                      <input
+                        v-model="newAddress.name"
+                        type="text"
+                        name="addr-name"
+                        placeholder="Введите название адреса"
+                        required
+                      />
                     </label>
                   </div>
-    
+
                   <div class="cart-form__input">
                     <label class="input">
                       <span>Улица*</span>
-                      <input v-model="newAddress.street" type="text" name="street" placeholder="Введите название улицы" required />
+                      <input
+                        v-model="newAddress.street"
+                        type="text"
+                        name="street"
+                        placeholder="Введите название улицы"
+                        required
+                      />
                     </label>
                   </div>
-    
+
                   <div class="cart-form__input cart-form__input--small">
                     <label class="input">
                       <span>Дом*</span>
-                      <input v-model="newAddress.building" type="text" name="house" placeholder="Введите номер дома" required />
+                      <input
+                        v-model="newAddress.building"
+                        type="text"
+                        name="house"
+                        placeholder="Введите номер дома"
+                        required
+                      />
                     </label>
                   </div>
-    
+
                   <div class="cart-form__input cart-form__input--small">
                     <label class="input">
                       <span>Квартира</span>
-                      <input v-model="newAddress.flat" type="text" name="apartment" placeholder="Введите № квартиры" />
+                      <input
+                        v-model="newAddress.flat"
+                        type="text"
+                        name="apartment"
+                        placeholder="Введите № квартиры"
+                      />
                     </label>
                   </div>
                 </div>
@@ -196,39 +272,67 @@
                 <div class="cart-form__input">
                   <label class="input">
                     <span>Комментарий</span>
-                    <input v-model="newAddress.comment" type="text" name="comment" placeholder="Введите комментарий" />
+                    <input
+                      v-model="newAddress.comment"
+                      type="text"
+                      name="comment"
+                      placeholder="Введите комментарий"
+                    />
                   </label>
                 </div>
               </div>
-              <div v-else-if="selectedExistingAddress" class="cart-form__address">
+              <div
+                v-else-if="selectedExistingAddress"
+                class="cart-form__address"
+              >
                 <div class="cart-form__label">Адрес доставки:</div>
 
                 <div class="cart-form__address-wrapper">
                   <div class="cart-form__input">
                     <label class="input">
                       <span>Название адреса*</span>
-                      <input :value="selectedExistingAddress.name" type="text" name="addr-name" readonly />
+                      <input
+                        :value="selectedExistingAddress.name"
+                        type="text"
+                        name="addr-name"
+                        readonly
+                      />
                     </label>
                   </div>
-    
+
                   <div class="cart-form__input">
                     <label class="input">
                       <span>Улица*</span>
-                      <input :value="selectedExistingAddress.street" type="text" name="street" readonly />
+                      <input
+                        :value="selectedExistingAddress.street"
+                        type="text"
+                        name="street"
+                        readonly
+                      />
                     </label>
                   </div>
-    
+
                   <div class="cart-form__input cart-form__input--small">
                     <label class="input">
                       <span>Дом*</span>
-                      <input :value="selectedExistingAddress.building" type="text" name="house" readonly />
+                      <input
+                        :value="selectedExistingAddress.building"
+                        type="text"
+                        name="house"
+                        readonly
+                      />
                     </label>
                   </div>
-    
+
                   <div class="cart-form__input cart-form__input--small">
                     <label class="input">
                       <span>Квартира</span>
-                      <input :value="selectedExistingAddress.flat || ''" type="text" name="apartment" readonly />
+                      <input
+                        :value="selectedExistingAddress.flat || ''"
+                        type="text"
+                        name="apartment"
+                        readonly
+                      />
                     </label>
                   </div>
                 </div>
@@ -236,7 +340,12 @@
                 <div class="cart-form__input">
                   <label class="input">
                     <span>Комментарий</span>
-                    <input :value="selectedExistingAddress.comment || ''" type="text" name="comment" readonly />
+                    <input
+                      :value="selectedExistingAddress.comment || ''"
+                      type="text"
+                      name="comment"
+                      readonly
+                    />
                   </label>
                 </div>
               </div>
@@ -247,23 +356,35 @@
     </main>
     <section class="footer">
       <div class="footer__more">
-        <router-link to="/" class="button button--border button--arrow">Хочу еще одну</router-link>
+        <router-link to="/" class="button button--border button--arrow"
+          >Хочу еще одну</router-link
+        >
       </div>
-      <p class="footer__text">Перейти к конструктору<br />чтоб собрать ещё одну пиццу</p>
+      <p class="footer__text">
+        Перейти к конструктору<br />чтоб собрать ещё одну пиццу
+      </p>
       <div class="footer__price">
         <b>Итого: {{ cartStore.totalPrice }} ₽</b>
       </div>
 
       <div class="footer__submit">
-        <button type="submit" class="button" :disabled="isSubmitting || cartStore.isEmpty">
-          {{ isSubmitting ? "Отправка..." : "Оформить заказ" }}
+        <button
+          type="submit"
+          :class="['button', isSubmitting && 'button--loading']"
+          :disabled="isSubmitting || cartStore.isEmpty"
+        >
+          <template v-if="isSubmitting">
+            <LoadingSpinner size="small" :message="''" />
+            <span class="button__text">Отправка...</span>
+          </template>
+          <span v-else class="button__text">Оформить заказ</span>
         </button>
       </div>
     </section>
-    <OrderSuccessPopup 
-      v-model="showSuccessPopup" 
-      :redirect-to="authStore.isAuthenticated ? '/orders' : '/'" 
-      @update:modelValue="handlePopupClose"
+    <OrderSuccessPopup
+      v-model="showSuccessPopup"
+      :redirect-to="authStore.isAuthenticated ? '/orders' : '/'"
+      @update:model-value="handlePopupClose"
     />
   </form>
 </template>
@@ -280,6 +401,10 @@ import { AddressesService, OrdersService, API_BASE_URL } from "@/services";
 import type { CartPizza } from "@/stores/cart";
 import { getImageUrl } from "@/utils/images";
 import OrderSuccessPopup from "@/common/components/order-success-popup/OrderSuccessPopup.vue";
+import { useToast } from "@/composables/useToast";
+import { logger } from "@/utils/logger";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
+import { usePhoneInput } from "@/composables/usePhoneInput";
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -289,9 +414,10 @@ const authStore = useAuthStore();
 const pizzaStore = usePizzaStore();
 const addressesService = new AddressesService(API_BASE_URL);
 const ordersService = new OrdersService(API_BASE_URL);
+const toast = useToast();
 
 const deliveryType = ref<string>("pickup");
-const phone = ref<string>("");
+const phoneInput = usePhoneInput("");
 const showSuccessPopup = ref(false);
 const isSubmitting = ref(false);
 const newAddress = ref({
@@ -315,9 +441,9 @@ const selectedExistingAddress = computed(() => {
 const updatePhone = () => {
   if (authStore.isAuthenticated) {
     if (profileStore.hasProfile && profileStore.phone) {
-      phone.value = profileStore.phone;
+      phoneInput.setValue(profileStore.phone);
     } else if (authStore.user?.phone) {
-      phone.value = authStore.user.phone;
+      phoneInput.setValue(authStore.user.phone);
     }
   }
 };
@@ -328,7 +454,7 @@ watch(
   () => {
     updatePhone();
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(async () => {
@@ -338,16 +464,16 @@ onMounted(async () => {
     if (!authStore.user && !authStore.isLoading) {
       await authStore.fetchUser();
     }
-    
+
     // Предзаполняем телефон (на случай если watch не сработал)
     updatePhone();
-    
+
     // Загружаем адреса пользователя
     try {
       const addresses = await addressesService.findAll();
       profileStore.addresses = addresses;
     } catch (error) {
-      console.error("Ошибка загрузки адресов:", error);
+      logger.error("Ошибка загрузки адресов:", error);
     }
   }
 });
@@ -385,7 +511,9 @@ const getPizzaSauceKey = (pizza: CartPizza): string => {
 };
 
 // Получаем массив объектов ингредиентов для визуализации пиццы (с правильными классами --second и --third)
-const getPizzaIngredientsKeys = (pizza: CartPizza): Array<{ key: string; count: number }> => {
+const getPizzaIngredientsKeys = (
+  pizza: CartPizza,
+): Array<{ key: string; count: number }> => {
   const ingredients: Array<{ key: string; count: number }> = [];
   for (const id in pizza.ingredients) {
     const item = pizza.ingredients[id];
@@ -411,13 +539,13 @@ const editPizza = (pizza: CartPizza) => {
   pizzaStore.setSize(pizza.size);
   pizzaStore.setSauce(pizza.sauce);
   pizzaStore.setPizzaName(pizza.name);
-  
+
   // Устанавливаем ингредиенты
   pizzaStore.selectedIngredients = { ...pizza.ingredients };
-  
+
   // Удаляем пиццу из корзины
   cartStore.removePizza(pizza.id);
-  
+
   // Переходим на главную страницу
   router.push("/");
 };
@@ -428,16 +556,23 @@ const handleSubmit = async () => {
   }
 
   // Валидация телефона
-  if (!phone.value || !phone.value.trim()) {
-    alert("Пожалуйста, укажите контактный телефон");
+  if (!phoneInput.validate()) {
+    phoneInput.touched.value = true;
+    if (phoneInput.error.value) {
+      toast.warning(phoneInput.error.value);
+    }
     return;
   }
 
   // Валидация адреса, если требуется доставка
   let addressData = null;
   if (deliveryType.value === "new") {
-    if (!newAddress.value.name?.trim() || !newAddress.value.street?.trim() || !newAddress.value.building?.trim()) {
-      alert("Пожалуйста, заполните все обязательные поля адреса");
+    if (
+      !newAddress.value.name?.trim() ||
+      !newAddress.value.street?.trim() ||
+      !newAddress.value.building?.trim()
+    ) {
+      toast.warning("Пожалуйста, заполните все обязательные поля адреса");
       return;
     }
     addressData = {
@@ -451,7 +586,9 @@ const handleSubmit = async () => {
     const addressId = parseInt(deliveryType.value.replace("address-", ""));
     const address = profileStore.getAddressById(addressId);
     if (address) {
+      // Включаем id существующего адреса, чтобы бэкенд не создавал дубликат
       addressData = {
+        id: address.id,
         name: address.name,
         street: address.street,
         building: address.building,
@@ -461,9 +598,9 @@ const handleSubmit = async () => {
     }
   }
 
-  // Если не самовывоз и адрес не указан
+  // Если не "Получу сам" и адрес не указан
   if (deliveryType.value !== "pickup" && !addressData) {
-    alert("Пожалуйста, выберите или введите адрес доставки");
+    toast.warning("Пожалуйста, выберите или введите адрес доставки");
     return;
   }
 
@@ -479,36 +616,43 @@ const handleSubmit = async () => {
       // Для авторизованного пользователя - отправляем на backend
       // Формируем данные для заказа
       const orderData = {
-        phone: phone.value.trim(),
+        phone: phoneInput.formattedPhone.value,
         pizzas: cartStore.pizzas.map((pizza) => ({
           name: pizza.name,
           sizeId: pizza.size.id!,
           doughId: pizza.dough.id!,
           sauceId: pizza.sauce.id!,
           quantity: pizza.quantity,
-          ingredients: Object.entries(pizza.ingredients).map(([ingredientId, item]) => ({
-            ingredientId: Number(ingredientId),
-            quantity: item.count,
-          })),
+          ingredients: Object.entries(pizza.ingredients).map(
+            ([ingredientId, item]) => ({
+              ingredientId: Number(ingredientId),
+              quantity: item.count,
+            }),
+          ),
         })),
         misc: cartStore.misc.map((item) => ({
           miscId: item.misc.id!,
           quantity: item.quantity,
         })),
-        address: addressData || {
-          name: "Самовывоз",
-          street: "-",
-          building: "-",
-        },
+        // При самовывозе отправляем адрес с именем "Самовывоз", чтобы бэкенд не создавал новый адрес
+        // addressData гарантированно существует благодаря валидации выше
+        address:
+          deliveryType.value === "pickup"
+            ? {
+                name: "Самовывоз",
+                street: "-",
+                building: "-",
+              }
+            : addressData!,
       };
 
       // Отправляем заказ
       const createdOrder = await ordersService.create(orderData);
-      console.log("Заказ создан:", createdOrder);
+      logger.info("Заказ создан:", createdOrder);
 
       // Очищаем корзину
       cartStore.clearCart();
-      
+
       // Очищаем конструктор
       pizzaStore.resetPizza();
 
@@ -516,12 +660,13 @@ const handleSubmit = async () => {
       showSuccessPopup.value = true;
     }
   } catch (error: any) {
-    console.error("Ошибка при оформлении заказа:", error);
-    const errorMessage = error.response?.data?.error?.message 
-      || error.response?.data?.message
-      || error.message
-      || "Произошла ошибка при оформлении заказа. Попробуйте еще раз.";
-    alert(errorMessage);
+    logger.error("Ошибка при оформлении заказа:", error);
+    const errorMessage =
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      error.message ||
+      "Произошла ошибка при оформлении заказа. Попробуйте еще раз.";
+    toast.error(errorMessage);
   } finally {
     isSubmitting.value = false;
   }
@@ -538,12 +683,6 @@ const handlePopupClose = (value: boolean) => {
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
-@use "@/assets/scss/blocks/input";
-@use "@/assets/scss/blocks/select";
-@use "@/assets/scss/blocks/product";
-@use "@/assets/scss/blocks/counter";
 @use "@/assets/scss/blocks/cart";
 @use "@/assets/scss/blocks/cart-list";
 @use "@/assets/scss/blocks/cart-form";
@@ -553,5 +692,15 @@ const handlePopupClose = (value: boolean) => {
 @use "@/assets/scss/layout/container";
 @use "@/assets/scss/layout/content";
 @use "@/assets/scss/layout/layout-form";
-</style>
 
+.input--error input {
+  border-color: #c62828;
+}
+
+.input__error {
+  display: block;
+  margin-top: 5px;
+  color: #c62828;
+  font-size: 12px;
+}
+</style>

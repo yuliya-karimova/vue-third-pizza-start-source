@@ -1,3 +1,5 @@
+import { logger } from "./logger";
+
 /**
  * Анимация полета элемента к корзине
  */
@@ -24,7 +26,7 @@ export function flyToCart(
   // Получаем координаты конечной точки (корзина)
   const toElement = document.querySelector(toSelector) as HTMLElement;
   if (!toElement) {
-    console.warn("Элемент корзины не найден");
+    logger.warn("Элемент корзины не найден");
     if (onComplete) onComplete();
     return;
   }
@@ -108,7 +110,7 @@ export function flyToCart(
       
       // Обработка ошибки загрузки изображения
       img.onerror = () => {
-        console.warn("Не удалось загрузить изображение, используем fallback");
+        logger.warn("Не удалось загрузить изображение, используем fallback");
         flyingElement.innerHTML = "";
         createFallbackElement();
         document.body.appendChild(flyingElement);

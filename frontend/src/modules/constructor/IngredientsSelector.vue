@@ -83,7 +83,7 @@ const onIngredientDragStart = (event: DragEvent, ingredient: Ingredient) => {
     event.preventDefault();
     return;
   }
-  
+
   if (event.dataTransfer) {
     event.dataTransfer.setData("ingredientId", String(ingredient.id));
     event.dataTransfer.effectAllowed = "copy";

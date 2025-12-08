@@ -7,11 +7,14 @@
 
   @include ds-typography.b-s18-h21;
   font-family: inherit;
-  display: block;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
 
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
+  padding: 4px 8px;
 
   cursor: pointer;
   transition: 0.3s;
@@ -105,5 +108,25 @@
   &--white {
     background-color: ds-colors.$white;
     color: ds-colors.$green-500;
+  }
+
+  &--loading {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    .loading-spinner {
+      padding: 0;
+
+      &__spinner {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  &__text {
+    margin-left: 0;
   }
 }

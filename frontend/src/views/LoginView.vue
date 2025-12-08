@@ -6,7 +6,7 @@
     <div class="sign-form__title">
       <h1 class="title title--small">Авторизуйтесь на сайте</h1>
     </div>
-    <form @submit.prevent="onSubmit" action="test.html" method="post">
+    <form action="test.html" method="post" @submit.prevent="onSubmit">
       <div v-if="authStore.error" class="sign-form__error">
         {{ authStore.error }}
       </div>
@@ -22,7 +22,9 @@
             :class="{ 'input--error': errors.email }"
             @blur="validateEmail"
           />
-          <span v-if="errors.email" class="input__error">{{ errors.email }}</span>
+          <span v-if="errors.email" class="input__error">{{
+            errors.email
+          }}</span>
         </label>
       </div>
 
@@ -37,12 +39,29 @@
             :class="{ 'input--error': errors.password }"
             @blur="validatePassword"
           />
-          <span v-if="errors.password" class="input__error">{{ errors.password }}</span>
+          <span v-if="errors.password" class="input__error">{{
+            errors.password
+          }}</span>
         </label>
       </div>
-      <button type="submit" class="button" :disabled="authStore.isLoading || !isFormValid">
-        {{ authStore.isLoading ? "Вход..." : "Авторизоваться" }}
+      <button
+        type="submit"
+        :class="['button', authStore.isLoading && 'button--loading']"
+        :disabled="authStore.isLoading || !isFormValid"
+      >
+        <template v-if="authStore.isLoading">
+          <LoadingSpinner size="small" :message="''" />
+          <span class="button__text">Вход...</span>
+        </template>
+        <span v-else class="button__text">Авторизоваться</span>
       </button>
+
+      <div class="sign-form__link">
+        <p>
+          Нет аккаунта?
+          <router-link to="/signup">Зарегистрироваться</router-link>
+        </p>
+      </div>
     </form>
   </div>
 </template>
@@ -51,6 +70,8 @@
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { logger } from "@/utils/logger";
+import { LoadingSpinner } from "@/common/components/loading-spinner";
 
 const router = useRouter();
 const route = useRoute();
@@ -62,7 +83,7 @@ const errors = ref<{ email?: string; password?: string }>({});
 
 const validateEmail = () => {
   errors.value.email = undefined;
-  
+
   if (!email.value) {
     errors.value.email = "E-mail обязателен";
     return false;
@@ -79,7 +100,7 @@ const validateEmail = () => {
 
 const validatePassword = () => {
   errors.value.password = undefined;
-  
+
   if (!password.value) {
     errors.value.password = "Пароль обязателен";
     return false;
@@ -89,7 +110,12 @@ const validatePassword = () => {
 };
 
 const isFormValid = computed(() => {
-  return email.value && password.value && !errors.value.email && !errors.value.password;
+  return (
+    email.value &&
+    password.value &&
+    !errors.value.email &&
+    !errors.value.password
+  );
 });
 
 const onSubmit = async () => {
@@ -109,16 +135,12 @@ const onSubmit = async () => {
     const redirect = route.query.redirect as string;
     router.push(redirect || "/");
   } catch (error) {
-    console.error("Ошибка авторизации:", error);
+    logger.error("Ошибка авторизации:", error);
   }
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
-@use "@/assets/scss/blocks/input";
-@use "@/assets/scss/blocks/close";
 @use "@/assets/scss/layout/sign-form";
 
 .sign-form__error {
@@ -140,5 +162,24 @@ const onSubmit = async () => {
 .input--error input {
   border-color: #c62828;
 }
-</style>
 
+.sign-form__link {
+  margin-top: 20px;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  a {
+    color: #73b918;
+    text-decoration: underline;
+
+    &:hover {
+      color: #5d9314;
+    }
+  }
+}
+</style>

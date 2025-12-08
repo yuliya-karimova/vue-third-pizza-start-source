@@ -8,6 +8,7 @@ import {
   MiscService,
   API_BASE_URL,
 } from "@/services";
+import { logger } from "@/utils/logger";
 
 export const useDataStore = defineStore("data", {
   state: () => ({
@@ -77,7 +78,7 @@ export const useDataStore = defineStore("data", {
         this.misc = misc;
       } catch (error: any) {
         this.error = error.message || "Ошибка при загрузке данных";
-        console.error("Ошибка загрузки данных:", error);
+        logger.error("Ошибка загрузки данных:", error);
       } finally {
         this.isLoading = false;
       }

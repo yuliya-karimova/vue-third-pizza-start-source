@@ -4,15 +4,13 @@
 @use "../mixins/m_center";
 
 .diameter__input {
-  margin-right: 8.7%;
-  margin-bottom: 20px;
-  padding-top: 7px;
-  padding-bottom: 6px;
-
   cursor: pointer;
-
-  span {
+  
+  div {
     @include ds-typography.r-s16-h19;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
 
     position: relative;
 
@@ -40,31 +38,31 @@
   }
 
   &--small {
-    span::before {
+    div::before {
       background-size: 18px;
     }
   }
 
   &--normal {
-    span::before {
+    div::before {
       background-size: 29px;
     }
   }
 
   &--big {
-    span::before {
+    div::before {
       background-size: 100%;
     }
   }
 
   &:hover {
-    span::before {
+    div::before {
       box-shadow: ds-shadows.$shadow-regular;
     }
   }
 
   input {
-    &:checked + span::before {
+    &:checked + div::before {
       box-shadow: ds-shadows.$shadow-large;
     }
   }

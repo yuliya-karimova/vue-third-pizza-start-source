@@ -10,3 +10,4 @@ export * from './order.repository';
 export * from './misc.repository';
 export * from './misc-order.repository';
 export * from './pizza-ingredient.repository';
+export * from './favorite-pizza.repository';

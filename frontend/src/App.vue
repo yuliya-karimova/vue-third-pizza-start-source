@@ -1,11 +1,13 @@
 <template>
   <router-view />
+  <ToastNotification />
 </template>
 
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useDataStore } from "@/stores/data";
 import { useAuthStore } from "@/stores/auth";
+import { ToastNotification } from "@/common/components/toast-notification";
 
 const dataStore = useDataStore();
 const authStore = useAuthStore();

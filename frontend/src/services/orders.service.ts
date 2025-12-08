@@ -43,12 +43,13 @@ export interface CreateOrderDto {
     quantity: number;
   }>;
   address: {
+    id?: number;
     name: string;
     street: string;
     building: string;
     flat?: string;
     comment?: string;
-  };
+  } | null;
 }
 
 export interface Order {

@@ -10,6 +10,7 @@
   display: block;
 
   padding-left: 36px;
+  margin-bottom: 8px;
 
   &::before {
     @include m_center.p_center-v;

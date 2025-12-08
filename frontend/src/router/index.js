@@ -3,10 +3,12 @@ import AppLayout from "@/layouts/AppLayout.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
+import SignUpView from "@/views/SignUpView.vue";
 import CartView from "@/views/CartView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import UserView from "@/views/UserView.vue";
 import OrdersView from "@/views/OrdersView.vue";
+import FavoritesView from "@/views/FavoritesView.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
@@ -44,6 +46,12 @@ const router = createRouter({
           component: OrdersView,
           meta: { requiresAuth: true },
         },
+        {
+          path: "favorites",
+          name: "favorites",
+          component: FavoritesView,
+          meta: { requiresAuth: true },
+        },
       ],
     },
     {
@@ -58,12 +66,24 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/signup",
+      component: AuthLayout,
+      children: [
+        {
+          path: "",
+          name: "signup",
+          component: SignUpView,
+          meta: { requiresGuest: true },
+        },
+      ],
+    },
   ],
 });
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  
+
   authStore.checkAuth();
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {

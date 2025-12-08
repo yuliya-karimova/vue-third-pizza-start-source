@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
+import { logger } from "@/utils/logger";
 
 export class HttpService {
   protected client: AxiosInstance;
@@ -49,21 +50,21 @@ export class HttpService {
           this.handleUnauthorized();
           break;
         case 403:
-          console.error("Доступ запрещен");
+          logger.error("Доступ запрещен");
           break;
         case 404:
-          console.error("Ресурс не найден");
+          logger.warn("Ресурс не найден", { status, url: error.config?.url });
           break;
         case 500:
-          console.error("Ошибка сервера");
+          logger.error("Ошибка сервера", { status, data });
           break;
         default:
-          console.error("Произошла ошибка:", data);
+          logger.error("Произошла ошибка:", data);
       }
     } else if (error.request) {
-      console.error("Ошибка сети. Проверьте подключение к серверу");
+      logger.error("Ошибка сети. Проверьте подключение к серверу", error.request);
     } else {
-      console.error("Ошибка:", error.message);
+      logger.error("Ошибка:", error.message);
     }
 
     return Promise.reject(error);

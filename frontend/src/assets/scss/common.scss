@@ -1,20 +1,23 @@
-
 @use "ds-system/ds-colors";
 @use "ds-system/ds-shadows";
 @use "ds-system/ds-typography";
 
-// Основные блоки (используются в большинстве шаблонов)
+// Основные блоки (используются в большинстве шаблонов) - импортируем глобально
 @use "blocks/title";
 @use "blocks/button";
 @use "blocks/input";
 @use "blocks/select";
 @use "blocks/product";
 @use "blocks/counter";
+@use "blocks/close";
 
-// Блоки, используемые в конкретных шаблонах
-@use "blocks/cart-list";
-@use "blocks/address-form";
+div {
+  box-sizing: border-box;
+}
 
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
 
 // Правила, которые повторяются в разных компонентах
 .main__wrapper {
@@ -34,9 +37,8 @@
   }
 
   p {
-    padding: 0 95px;
-
     text-align: center;
+    margin: 0;
 
     font-size: 20px;
     line-height: 30px;
@@ -49,7 +51,7 @@
 
 // Sheet стили (используются во многих компонентах)
 .sheet {
-  padding-top: 15px;
+  padding: 15px;
 
   border-radius: 8px;
   background-color: ds-colors.$white;
@@ -65,11 +67,9 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: 24px;
 
-  margin-top: 8px;
-  padding-top: 18px;
-  padding-right: 18px;
-  padding-left: 18px;
+  padding: 18px;
 
   border-top: 1px solid rgba(ds-colors.$green-500, 0.1);
 }

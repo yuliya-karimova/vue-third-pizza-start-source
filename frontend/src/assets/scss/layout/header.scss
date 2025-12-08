@@ -57,12 +57,52 @@
   }
 }
 
+.header__favorites {
+  display: flex;
+  align-items: stretch;
+
+  a {
+    @include ds-typography.b-s18-h21;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 48px;
+    padding: 14px 16px;
+
+    transition: 0.3s;
+
+    cursor: pointer;
+
+    color: ds-colors.$white;
+    background-color: ds-colors.$green-500;
+    font-size: 20px;
+    line-height: 1;
+
+    &:hover:not(:active) {
+      background-color: ds-colors.$green-400;
+    }
+
+    &:active {
+      background-color: ds-colors.$green-600;
+    }
+
+    &:focus {
+      opacity: 0.5;
+    }
+  }
+}
+
 .header__user {
   display: flex;
   align-items: center;
 
-  a {
-    display: block;
+  a {    
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: 60px;
     
     padding: 14px 20px;
     
