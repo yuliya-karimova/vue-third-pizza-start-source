@@ -4,6 +4,10 @@
 Открывается в браузере по ссылке:
 http://localhost:8080/
 
+Базовый юзер:
+Логин - user@example.com
+Пароль - user@example.com
+
 Запуск тестов:
 - `cd frontend`
 - `npm run test:unit`
