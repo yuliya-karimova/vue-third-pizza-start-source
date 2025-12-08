@@ -1,6 +1,5 @@
 @use "../ds-system/ds-colors";
 @use "../ds-system/ds-shadows";
-@use "../mixins/m_center";
 
 .popup {
   position: fixed;
@@ -33,7 +32,10 @@
   position: relative;
   z-index: 1001;
 
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 
   box-sizing: border-box;
   width: 420px;
@@ -72,9 +74,6 @@
   }
 
   p {
-    margin-top: 24px;
-    margin-bottom: 24px;
-
     text-align: center;
   }
 }
@@ -88,67 +87,5 @@
 .popup__button {
   a {
     padding: 16px 32px;
-  }
-}
-
-.close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-
-  width: 25px;
-  height: 25px;
-
-  cursor: pointer;
-  transition: 0.3s;
-  text-decoration: none;
-
-  color: ds-colors.$black;
-  border-radius: 50%;
-  outline: none;
-
-  &::before,
-  &::after {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-
-    width: 25px;
-    height: 2px;
-
-    content: "";
-
-    border-radius: 2px;
-    background-color: ds-colors.$black;
-  }
-
-  &::before {
-    transform: translate(-50%, -50%) rotate(-45deg);
-  }
-
-  &::after {
-    transform: translate(-50%, -50%) rotate(45deg);
-  }
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &:active {
-    opacity: 0.5;
-  }
-
-  &:focus {
-    &::before,
-    &::after {
-      background-color: ds-colors.$orange-100;
-    }
-  }
-
-  &--white {
-    &::before,
-    &::after {
-      background-color: ds-colors.$white;
-    }
   }
 }

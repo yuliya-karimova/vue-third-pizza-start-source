@@ -16,7 +16,7 @@
             :value="size.id"
             class="visually-hidden"
           />
-          <span>{{ size.name }}</span>
+          <div>{{ size.name }}</div>
         </label>
       </div>
     </div>

@@ -47,6 +47,4 @@ const handleClose = () => {
 
 <style lang="scss">
 @use "@/assets/scss/layout/popup";
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
 </style>

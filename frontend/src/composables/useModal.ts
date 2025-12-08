@@ -11,7 +11,14 @@ export interface ModalOptions {
 
 export function useModal() {
   const isVisible = ref(false);
-  const modalOptions = ref<ModalOptions>({});
+  const modalOptions = ref<ModalOptions>({
+    title: "",
+    message: "",
+    confirmText: "Да",
+    cancelText: "Отмена",
+    showCancelButton: true,
+    isDanger: false,
+  });
   const resolveRef = ref<((value: boolean) => void) | null>(null);
 
   const show = (options: ModalOptions = {}): Promise<boolean> => {
@@ -47,12 +54,29 @@ export function useModal() {
     isVisible.value = false;
   };
 
+  const reset = () => {
+    isVisible.value = false;
+    modalOptions.value = {
+      title: "",
+      message: "",
+      confirmText: "Да",
+      cancelText: "Отмена",
+      showCancelButton: true,
+      isDanger: false,
+    };
+    if (resolveRef.value) {
+      resolveRef.value(false);
+      resolveRef.value = null;
+    }
+  };
+
   return {
     isVisible,
     modalOptions,
     show,
     confirm,
     cancel,
+    reset,
   };
 }
 

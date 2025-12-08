@@ -46,7 +46,7 @@
       </div>
       <button
         type="submit"
-        class="button button--loading"
+        :class="['button', authStore.isLoading && 'button--loading']"
         :disabled="authStore.isLoading || !isFormValid"
       >
         <template v-if="authStore.isLoading">
@@ -134,10 +134,6 @@ const onSubmit = async () => {
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
-@use "@/assets/scss/blocks/input";
-@use "@/assets/scss/blocks/close";
 @use "@/assets/scss/layout/sign-form";
 
 .sign-form__error {
@@ -158,25 +154,5 @@ const onSubmit = async () => {
 
 .input--error input {
   border-color: #c62828;
-}
-
-.button--loading {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  .loading-spinner {
-    padding: 0;
-
-    &__spinner {
-      width: 16px;
-      height: 16px;
-    }
-  }
-}
-
-.button__text {
-  margin-left: 0;
 }
 </style>

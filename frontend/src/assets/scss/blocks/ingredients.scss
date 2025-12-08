@@ -40,17 +40,15 @@
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
+  gap: 24px;
 }
 
 .ingredients__item {
   width: 100px;
   min-height: 40px;
-  margin-right: 17px;
-  margin-bottom: 35px;
 }
 
 .ingredients__counter {
   width: 54px;
-  margin-top: 10px;
   margin-left: 36px;
 }

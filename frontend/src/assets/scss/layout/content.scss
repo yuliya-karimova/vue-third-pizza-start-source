@@ -1,60 +1,36 @@
 @use "../ds-system/ds-typography";
 
 .content {
-  padding-top: 20px;
+  padding: 20px;
 }
 
 .content__wrapper {
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 540px 420px;
+  gap: 24px;
 
-  width: 920px;
+  width: max-content;
   margin: 0 auto;
-  padding-right: 2.12%;
-  padding-bottom: 30px;
-  padding-left: 2.12%;
+
+  .title {
+    grid-column: 1 / span 2;
+  }
 }
 
-.content__dough {
-  width: 527px;
-  margin-top: 15px;
-  margin-right: auto;
-  margin-bottom: 15px;
-}
-
-.content__diameter {
-  width: 373px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-
-.content__ingredients {
-  width: 527px;
-  margin-top: 15px;
-  margin-right: auto;
-  margin-bottom: 15px;
-}
-
-.content__pizza {
-  width: 373px;
-  margin-top: 15px;
-  margin-bottom: 15px;
+.content__ingredients.sheet {
+  height: 100%;
 }
 
 .content__constructor {
-  width: 315px;
-  margin-top: 25px;
-  margin-right: auto;
-  margin-left: auto;
+  width: 100%;
+  padding: 24px;
 }
 
 .content__result {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  margin-top: 25px;
+  justify-content: space-between;
+  gap: 24px;
 
   p {
     @include ds-typography.b-s24-h28;
@@ -63,7 +39,6 @@
   }
 
   button {
-    margin-left: 12px;
     padding: 16px 45px;
   }
 }

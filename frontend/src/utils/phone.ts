@@ -3,9 +3,9 @@
  */
 
 /**
- * Формат российского телефона: +7 999-999-99-99
+ * Формат российского телефона: +7 999 777-77-77
  */
-export const PHONE_PATTERN = /^\+7\s\d{3}-\d{3}-\d{2}-\d{2}$/;
+export const PHONE_PATTERN = /^\+7\s\d{3}\s\d{3}-\d{2}-\d{2}$/;
 
 /**
  * Упрощенный паттерн для проверки (только цифры после +7)
@@ -20,7 +20,7 @@ export function cleanPhoneNumber(phone: string): string {
 }
 
 /**
- * Форматирует номер телефона в формат +7 999-999-99-99
+ * Форматирует номер телефона в формат +7 999 777-77-77
  */
 export function formatPhoneNumber(phone: string): string {
   const cleaned = cleanPhoneNumber(phone);
@@ -36,21 +36,17 @@ export function formatPhoneNumber(phone: string): string {
     digits = "7" + digits;
   }
   
-  // Если номер начинается с +7, убираем +
-  if (digits.startsWith("+7")) {
-    digits = digits.slice(1);
-  }
-  
-  // Форматируем в +7 999-999-99-99
+  // Форматируем в +7 999 777-77-77 (нужно 11 цифр: 7 + 10 цифр номера)
   if (digits.startsWith("7") && digits.length === 11) {
     const code = digits.slice(0, 1);
     const part1 = digits.slice(1, 4);
     const part2 = digits.slice(4, 7);
     const part3 = digits.slice(7, 9);
     const part4 = digits.slice(9, 11);
-    return `+${code} ${part1}-${part2}-${part3}-${part4}`;
+    return `+${code} ${part1} ${part2}-${part3}-${part4}`;
   }
   
+  // Если номер неполный, возвращаем как есть (для промежуточного ввода)
   return phone;
 }
 
@@ -105,15 +101,15 @@ export function applyPhoneMask(value: string): string {
   }
   
   if (digits.length <= 7) {
-    return `+7 ${digits.slice(1, 4)}-${digits.slice(4)}`;
+    return `+7 ${digits.slice(1, 4)} ${digits.slice(4)}`;
   }
   
   if (digits.length <= 9) {
-    return `+7 ${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
+    return `+7 ${digits.slice(1, 4)} ${digits.slice(4, 7)}-${digits.slice(7)}`;
   }
   
-  // Полный формат: +7 999-999-99-99
-  return `+7 ${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`;
+  // Полный формат: +7 999 777-77-77
+  return `+7 ${digits.slice(1, 4)} ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`;
 }
 
 /**
@@ -134,19 +130,11 @@ export function validatePhone(phone: string): {
   
   const cleaned = cleanPhoneNumber(phone);
   
-  // Проверяем количество цифр
-  if (cleaned.length < 10) {
+  // Проверяем количество цифр (для российского номера нужно 11 цифр: 7 + 10 цифр)
+  if (cleaned.length !== 11) {
     return {
       isValid: false,
-      error: "Телефон должен содержать минимум 10 цифр",
-    };
-  }
-  
-  // Проверяем формат
-  if (!PHONE_DIGITS_PATTERN.test(cleaned) && cleaned.length < 11) {
-    return {
-      isValid: false,
-      error: "Неверный формат телефона",
+      error: "Телефон должен содержать 11 цифр (формат: +7 999 777-77-77)",
     };
   }
   
@@ -163,7 +151,7 @@ export function validatePhone(phone: string): {
   if (!PHONE_PATTERN.test(formatted)) {
     return {
       isValid: false,
-      error: "Неверный формат телефона. Используйте формат: +7 999-999-99-99",
+      error: "Неверный формат телефона. Используйте формат: +7 999 777-77-77",
     };
   }
   
@@ -175,7 +163,7 @@ export function validatePhone(phone: string): {
 /**
  * Нормализует номер телефона для отправки на сервер
  * @param phone - номер телефона
- * @returns нормализованный номер (только цифры с кодом страны)
+ * @returns нормализованный номер (только цифры с кодом страны, формат: 79997777777)
  */
 export function normalizePhone(phone: string): string {
   const cleaned = cleanPhoneNumber(phone);
@@ -185,7 +173,7 @@ export function normalizePhone(phone: string): string {
     return "7" + cleaned.slice(1);
   }
   
-  // Если номер из 10 цифр, добавляем 7
+  // Если номер из 10 цифр, добавляем 7 в начало
   if (cleaned.length === 10) {
     return "7" + cleaned;
   }
@@ -195,6 +183,8 @@ export function normalizePhone(phone: string): string {
     return cleaned;
   }
   
+  // Если номер неполный или не соответствует формату, возвращаем как есть
+  // (валидация должна была пройти раньше)
   return cleaned;
 }
 

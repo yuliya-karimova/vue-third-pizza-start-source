@@ -76,9 +76,18 @@ export function usePhoneInput(initialValue: string = "") {
   /**
    * Установка значения
    */
-  const setValue = (value: string) => {
-    if (value) {
-      phone.value = formatPhoneNumber(value);
+  const setValue = (value: string | unknown) => {
+    // Защита от передачи объекта вместо строки
+    if (typeof value === "object" && value !== null) {
+      console.warn("usePhoneInput.setValue: получен объект вместо строки", value);
+      phone.value = "";
+      error.value = null;
+      return;
+    }
+    
+    const stringValue = String(value || "");
+    if (stringValue) {
+      phone.value = formatPhoneNumber(stringValue);
     } else {
       phone.value = "";
     }

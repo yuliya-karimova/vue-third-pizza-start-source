@@ -116,15 +116,6 @@ onUnmounted(() => {
 
 <style lang="scss">
 @use "@/assets/scss/layout/popup";
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
-@use "@/assets/scss/blocks/close";
-
-.popup__content--dialog {
-  p {
-    margin-bottom: 32px;
-  }
-}
 
 .popup__buttons {
   display: flex;

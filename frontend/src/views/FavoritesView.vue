@@ -77,7 +77,8 @@
               <button
                 type="button"
                 class="button button--transparent"
-                @click="deleteFavorite(favorite.id!)"
+                :disabled="!favorite.id"
+                @click="deleteFavorite(favorite.id)"
               >
                 Удалить
               </button>
@@ -128,17 +129,30 @@
         </section>
       </TransitionGroup>
     </div>
+
+    <ModalDialog
+      v-model="modalVisible"
+      :title="modalOptions.title"
+      :message="modalOptions.message"
+      :confirm-text="modalOptions.confirmText"
+      :cancel-text="modalOptions.cancelText"
+      :show-cancel-button="modalOptions.showCancelButton"
+      :is-danger="modalOptions.isDanger"
+      @confirm="modal.confirm"
+      @cancel="modal.cancel"
+    />
   </main>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useFavoritesStore } from "@/stores/favorites";
 import { usePizzaStore } from "@/stores/pizza";
 import { useDataStore } from "@/stores/data";
 import { useToast } from "@/composables/useToast";
 import { useModal } from "@/composables/useModal";
+import { ModalDialog } from "@/common/components/modal-dialog";
 import { LoadingSpinner } from "@/common/components/loading-spinner";
 import type { FavoritePizza } from "@/services";
 
@@ -148,6 +162,16 @@ const pizzaStore = usePizzaStore();
 const dataStore = useDataStore();
 const toast = useToast();
 const modal = useModal();
+
+// Computed properties to unwrap refs for template usage
+const modalVisible = computed({
+  get: () => modal.isVisible.value,
+  set: (value) => {
+    modal.isVisible.value = value;
+  },
+});
+
+const modalOptions = computed(() => modal.modalOptions.value);
 
 onMounted(async () => {
   await favoritesStore.loadFavorites();
@@ -241,10 +265,18 @@ const loadToConstructor = (favorite: FavoritePizza) => {
   router.push("/");
 };
 
-const deleteFavorite = async (id: number) => {
+const deleteFavorite = async (id: number | undefined) => {
+  if (!id) {
+    toast.error("Не удалось определить ID пиццы");
+    return;
+  }
+
+  const favorite = favoritesStore.getFavoriteById(id);
+  const favoriteName = favorite?.name || "пиццу";
+
   const confirmed = await modal.show({
     title: "Удаление из избранного",
-    message: `Вы уверены, что хотите удалить пиццу "${favoritesStore.getFavoriteById(id)?.name}" из избранного?`,
+    message: `Вы уверены, что хотите удалить "${favoriteName}" из избранного?`,
     confirmText: "Удалить",
     cancelText: "Отмена",
     isDanger: true,
@@ -269,8 +301,6 @@ const deleteFavorite = async (id: number) => {
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
 @use "@/assets/scss/blocks/pizza";
 @use "@/assets/scss/layout/layout";
 @use "@/assets/scss/layout/sidebar";

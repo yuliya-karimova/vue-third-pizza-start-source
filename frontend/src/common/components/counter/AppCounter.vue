@@ -64,7 +64,3 @@ const onIncrease = () => {
   }
 };
 </script>
-
-<style lang="scss">
-@use "@/assets/scss/blocks/counter";
-</style>

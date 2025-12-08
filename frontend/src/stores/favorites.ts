@@ -63,12 +63,12 @@ export const useFavoritesStore = defineStore("favorites", {
       try {
         const service = new FavoritePizzasService(API_BASE_URL);
         await service.deleteById(id);
-        const index = this.favoritePizzas.findIndex((pizza) => pizza.id === id);
-        if (index > -1) {
-          this.favoritePizzas.splice(index, 1);
-        }
+        // Используем filter для создания нового массива (лучше для реактивности)
+        this.favoritePizzas = this.favoritePizzas.filter((pizza) => pizza.id !== id);
+        logger.debug("Пицца удалена из избранного, ID:", id);
       } catch (error: any) {
         this.error = error.message || "Ошибка при удалении из избранного";
+        logger.error("Ошибка при удалении из избранного:", error);
         throw error;
       } finally {
         this.isLoading = false;

@@ -161,7 +161,3 @@ const onAddToCart = () => {
   pizzaStore.resetPizza();
 };
 </script>
-
-<style lang="scss">
-@use "@/assets/scss/blocks/title";
-</style>

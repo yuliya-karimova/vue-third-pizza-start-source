@@ -319,9 +319,6 @@ const deleteAddress = async () => {
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
-@use "@/assets/scss/blocks/input";
 @use "@/assets/scss/blocks/logo";
 @use "@/assets/scss/blocks/user";
 @use "@/assets/scss/blocks/icon";

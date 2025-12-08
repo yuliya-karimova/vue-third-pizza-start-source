@@ -2,7 +2,7 @@
   <form class="layout-form" @submit.prevent="handleSubmit">
     <main class="content cart">
       <div class="container">
-        <div class="cart__title">
+        <div>
           <h1 class="title title--big">Корзина</h1>
         </div>
 
@@ -110,7 +110,7 @@
           </li>
         </TransitionGroup>
 
-        <div class="cart__additional">
+        <div>
           <h2 class="title title--small">Дополнительно</h2>
           <ul class="additional-list">
             <li
@@ -175,7 +175,7 @@
               <span>Получение заказа:</span>
 
               <select v-model="deliveryType" name="delivery" class="select">
-                <option value="pickup">Заберу сам</option>
+                <option value="pickup">Получу сам</option>
                 <option value="new">Новый адрес</option>
                 <template v-if="authStore.isAuthenticated">
                   <option
@@ -191,23 +191,25 @@
 
             <label class="input input--big-label">
               <span>Контактный телефон:</span>
-              <input
-                :value="phoneInput.phone"
-                type="text"
-                name="tel"
-                placeholder="+7 999-999-99-99"
-                :class="{
-                  'input--error': phoneInput.error && phoneInput.touched,
-                }"
-                @input="phoneInput.handleInput"
-                @blur="phoneInput.handleBlur"
-              />
-              <span
-                v-if="phoneInput.error && phoneInput.touched"
-                class="input__error"
-              >
-                {{ phoneInput.error }}
-              </span>
+              <div>
+                <input
+                  :value="phoneInput.phone.value"
+                  type="text"
+                  name="tel"
+                  placeholder="+7 999 777-77-77"
+                  :class="{
+                    'input--error': phoneInput.error && phoneInput.touched,
+                  }"
+                  @input="phoneInput.handleInput"
+                  @blur="phoneInput.handleBlur"
+                />
+                <div
+                  v-if="phoneInput.error && phoneInput.touched"
+                  class="input__error"
+                >
+                  {{ phoneInput.error }}
+                </div>
+              </div>
             </label>
 
             <Transition name="slide-down">
@@ -584,7 +586,9 @@ const handleSubmit = async () => {
     const addressId = parseInt(deliveryType.value.replace("address-", ""));
     const address = profileStore.getAddressById(addressId);
     if (address) {
+      // Включаем id существующего адреса, чтобы бэкенд не создавал дубликат
       addressData = {
+        id: address.id,
         name: address.name,
         street: address.street,
         building: address.building,
@@ -594,7 +598,7 @@ const handleSubmit = async () => {
     }
   }
 
-  // Если не самовывоз и адрес не указан
+  // Если не "Получу сам" и адрес не указан
   if (deliveryType.value !== "pickup" && !addressData) {
     toast.warning("Пожалуйста, выберите или введите адрес доставки");
     return;
@@ -631,7 +635,7 @@ const handleSubmit = async () => {
           quantity: item.quantity,
         })),
         address: addressData || {
-          name: "Самовывоз",
+          name: "Получу сам",
           street: "-",
           building: "-",
         },
@@ -674,12 +678,6 @@ const handlePopupClose = (value: boolean) => {
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
-@use "@/assets/scss/blocks/input";
-@use "@/assets/scss/blocks/select";
-@use "@/assets/scss/blocks/product";
-@use "@/assets/scss/blocks/counter";
 @use "@/assets/scss/blocks/cart";
 @use "@/assets/scss/blocks/cart-list";
 @use "@/assets/scss/blocks/cart-form";
@@ -699,25 +697,5 @@ const handlePopupClose = (value: boolean) => {
   margin-top: 5px;
   color: #c62828;
   font-size: 12px;
-}
-
-.button--loading {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  .loading-spinner {
-    padding: 0;
-
-    &__spinner {
-      width: 16px;
-      height: 16px;
-    }
-  }
-}
-
-.button__text {
-  margin-left: 0;
 }
 </style>

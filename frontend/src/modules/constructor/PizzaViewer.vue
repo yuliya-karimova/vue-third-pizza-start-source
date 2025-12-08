@@ -13,6 +13,17 @@
       @dragover.prevent="onPizzaDragOver"
       @drop="onPizzaDrop"
     >
+      <button
+        v-if="showFavoriteButton"
+        type="button"
+        class="content__favorite-button"
+        :disabled="!isReady || isSaving"
+        :title="isSaving ? 'Сохранение...' : 'Добавить в избранное'"
+        @click="onSaveToFavorites"
+      >
+        <span v-if="isSaving" class="content__favorite-button-spinner" />
+        <span v-else>⭐</span>
+      </button>
       <div :class="`pizza pizza--foundation--${sizeKey}-${sauceKey}`">
         <div class="pizza__wrapper">
           <TransitionGroup name="scale" tag="div">
@@ -34,16 +45,6 @@
     <div class="content__result">
       <p>Итого: {{ price }} ₽</p>
       <div class="content__buttons">
-        <button
-          v-if="showFavoriteButton"
-          ref="saveFavoriteButton"
-          type="button"
-          class="button button--border button--favorite"
-          :disabled="!isReady || isSaving"
-          @click="onSaveToFavorites"
-        >
-          {{ isSaving ? "Сохранение..." : "⭐ В избранное" }}
-        </button>
         <button
           ref="addToCartButton"
           type="button"
@@ -194,7 +195,7 @@ const onSaveToFavorites = async () => {
       ingredients,
     });
 
-    toast.success("Пицца сохранена в избранное!");
+    toast.success("Пицца добавлена в избранное!");
     emit("savedToFavorites");
   } catch (error: any) {
     const errorMessage =
@@ -210,16 +211,81 @@ const onSaveToFavorites = async () => {
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/button";
 @use "@/assets/scss/blocks/pizza";
+@use "@/assets/scss/ds-system/ds-colors";
+@use "@/assets/scss/ds-system/ds-shadows";
+
+.content__constructor {
+  position: relative;
+}
+
+.content__favorite-button {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  cursor: pointer;
+  transition: 0.3s;
+
+  border: 2px solid ds-colors.$green-500;
+  border-radius: 50%;
+  outline: none;
+  background-color: ds-colors.$white;
+  box-shadow: ds-shadows.$shadow-light;
+
+  font-size: 20px;
+  line-height: 1;
+
+  &:hover:not(:disabled) {
+    background-color: ds-colors.$green-100;
+    box-shadow: ds-shadows.$shadow-regular;
+    transform: scale(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+    box-shadow: ds-shadows.$shadow-light;
+  }
+
+  &:focus:not(:disabled) {
+    box-shadow: ds-shadows.$shadow-regular;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.content__favorite-button-spinner {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid ds-colors.$green-500;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .content__buttons {
   display: flex;
   gap: 12px;
   align-items: center;
-}
-
-.button--favorite {
-  flex-shrink: 0;
 }
 </style>

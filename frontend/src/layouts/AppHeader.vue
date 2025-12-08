@@ -8,6 +8,9 @@
     <div class="header__cart">
       <router-link to="/cart">{{ totalPrice }} ₽</router-link>
     </div>
+    <div v-if="authStore.isAuthenticated" class="header__favorites">
+      <router-link to="/favorites" title="Избранные пиццы">⭐</router-link>
+    </div>
     <div class="header__user">
       <template v-if="authStore.isAuthenticated && authStore.user">
         <router-link to="/profile" class="header__user-name">

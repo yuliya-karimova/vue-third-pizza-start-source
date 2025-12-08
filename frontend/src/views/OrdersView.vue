@@ -189,13 +189,13 @@
     </div>
 
     <ModalDialog
-      v-model="modal.isVisible"
-      :title="modal.modalOptions.title"
-      :message="modal.modalOptions.message"
-      :confirm-text="modal.modalOptions.confirmText"
-      :cancel-text="modal.modalOptions.cancelText"
-      :show-cancel-button="modal.modalOptions.showCancelButton"
-      :is-danger="modal.modalOptions.isDanger"
+      v-model="modalVisible"
+      :title="modalOptions.title"
+      :message="modalOptions.message"
+      :confirm-text="modalOptions.confirmText"
+      :cancel-text="modalOptions.cancelText"
+      :show-cancel-button="modalOptions.showCancelButton"
+      :is-danger="modalOptions.isDanger"
       @confirm="modal.confirm"
       @cancel="modal.cancel"
     />
@@ -203,7 +203,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { useRouter } from "vue-router";
 import { OrdersService, API_BASE_URL } from "@/services";
 import type { Order, OrderPizza, OrderMisc } from "@/services/orders.service";
@@ -230,10 +230,28 @@ const isLoading = ref(false);
 const error = ref<string | null>(null);
 const filterQuery = ref<string>("");
 
+// Computed properties to unwrap refs for template usage
+const modalVisible = computed({
+  get: () => modal.isVisible.value,
+  set: (value) => {
+    modal.isVisible.value = value;
+  },
+});
+
+const modalOptions = computed(() => modal.modalOptions.value);
+
 onMounted(async () => {
+  // Сбрасываем состояние модального окна при монтировании
+  modal.reset();
+
   if (authStore.isAuthenticated) {
     await loadOrders();
   }
+});
+
+onBeforeUnmount(() => {
+  // Закрываем модальное окно при размонтировании компонента
+  modal.reset();
 });
 
 const loadOrders = async () => {
@@ -391,22 +409,22 @@ const getOrderPizzaIngredientsKeys = (
 
 const formatAddress = (order: Order): string => {
   if (!order.orderAddress) {
-    // Проверяем, есть ли адрес в заказе, но с именем "Самовывоз" или пустыми полями
-    // Если addressId не указан, значит самовывоз
+    // Проверяем, есть ли адрес в заказе, но с именем "Получу сам" или пустыми полями
+    // Если addressId не указан, значит Получу сам
     if (!order.addressId) {
-      return "Самовывоз";
+      return "Получу сам";
     }
     return "Адрес не указан";
   }
 
   const addr = order.orderAddress;
 
-  // Если адрес называется "Самовывоз" или имеет пустые поля street/building
+  // Если адрес называется "Получу сам" или имеет пустые поля street/building
   if (
-    addr.name === "Самовывоз" ||
+    addr.name === "Получу сам" ||
     (addr.street === "-" && addr.building === "-")
   ) {
-    return "Самовывоз";
+    return "Получу сам";
   }
 
   let address = addr.name;
@@ -544,13 +562,9 @@ const deleteOrder = async (order: Order) => {
 </script>
 
 <style lang="scss">
-@use "@/assets/scss/blocks/title";
-@use "@/assets/scss/blocks/button";
-@use "@/assets/scss/blocks/product";
 @use "@/assets/scss/blocks/pizza";
 @use "@/assets/scss/blocks/order";
 @use "@/assets/scss/blocks/logo";
-@use "@/assets/scss/blocks/input";
 @use "@/assets/scss/layout/layout";
 @use "@/assets/scss/layout/sidebar";
 
