@@ -5,8 +5,8 @@
 http://localhost:8080/
 
 Базовый юзер:
-Логин - user@example.com
-Пароль - user@example.com
+- Логин - user@example.com
+- Пароль - user@example.com
 
 Запуск тестов:
 - `cd frontend`
