@@ -49,7 +49,7 @@ export interface CreateOrderDto {
     building: string;
     flat?: string;
     comment?: string;
-  };
+  } | null;
 }
 
 export interface Order {

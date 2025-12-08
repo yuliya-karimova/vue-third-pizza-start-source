@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import logo from "@/assets/img/logo.svg";
+import logoImage from "@/assets/img/logo.svg";
 import { useCartStore } from "@/stores/cart";
 import { useAuthStore } from "@/stores/auth";
 import { getImageUrl } from "@/utils/images";
@@ -44,6 +44,8 @@ const router = useRouter();
 const cartStore = useCartStore();
 const authStore = useAuthStore();
 
+// Явная типизация для SVG импорта
+const logo: string = logoImage as string;
 const totalPrice = computed(() => cartStore.totalPrice);
 
 const getAvatarUrl = (avatar: string | undefined): string => {

@@ -55,6 +55,13 @@
         </template>
         <span v-else class="button__text">Авторизоваться</span>
       </button>
+
+      <div class="sign-form__link">
+        <p>
+          Нет аккаунта?
+          <router-link to="/signup">Зарегистрироваться</router-link>
+        </p>
+      </div>
     </form>
   </div>
 </template>
@@ -154,5 +161,25 @@ const onSubmit = async () => {
 
 .input--error input {
   border-color: #c62828;
+}
+
+.sign-form__link {
+  margin-top: 20px;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  a {
+    color: #73b918;
+    text-decoration: underline;
+
+    &:hover {
+      color: #5d9314;
+    }
+  }
 }
 </style>

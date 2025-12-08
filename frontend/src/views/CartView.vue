@@ -634,11 +634,16 @@ const handleSubmit = async () => {
           miscId: item.misc.id!,
           quantity: item.quantity,
         })),
-        address: addressData || {
-          name: "Получу сам",
-          street: "-",
-          building: "-",
-        },
+        // При самовывозе отправляем адрес с именем "Самовывоз", чтобы бэкенд не создавал новый адрес
+        // addressData гарантированно существует благодаря валидации выше
+        address:
+          deliveryType.value === "pickup"
+            ? {
+                name: "Самовывоз",
+                street: "-",
+                building: "-",
+              }
+            : addressData!,
       };
 
       // Отправляем заказ
